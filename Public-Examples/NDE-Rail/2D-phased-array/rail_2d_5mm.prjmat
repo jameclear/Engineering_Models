@@ -1,0 +1,71 @@
+c -------------------------------------------------------------- 
+c                   Project Material List
+c -------------------------------------------------------------- 
+
+
+c -------------------------------------------------------------------------
+c Global variables used in all the material definitions
+c -------------------------------------------------------------------------
+c
+symb epvacm = 8.854e-12               /* dielectric constant for vacumn
+symb freqdamp = 1.e6 if noexist       /* specified frequency for damping model
+symb rmu0 = 1.2566e-6
+
+symb #msg 5
+********************************************************
+Damping matched at $freqdamp Hz
+Redefine variable 'freqdamp' if device centre frequency
+varies significantly from this value
+********************************************************
+
+
+c
+c -------------------------------------------------------------------------
+c    Now define the axis transformation - only posx used in this file
+c -------------------------------------------------------------------------
+
+axis
+     form vctr
+     defn posx car2 0. 0. 0.    1.  0.  0.   0. 1. 0.
+     defn negx car2 0. 0. 0.   -1.  0.  0.   0. 1. 0.
+     defn posy car2 0. 0. 0.    0.  1.  0.   0. 0. 1.
+     defn negy car2 0. 0. 0.    0. -1.  0.   0. 0. 1.
+     defn posz car2 0. 0. 0.    0.  0.  1.   1. 0. 0.
+     defn negz car2 0. 0. 0.    0.  0. -1.   1. 0. 0.
+     end
+
+c -------------------------------------------------------------------------
+c    Input material properties to program
+c -------------------------------------------------------------------------
+
+matr
+c -------------------------------------------------------------- 
+c type : METAL : 
+c name : steel : 
+c desc : Mild Steel , generic : 
+c -------------------------------------------------------------- 
+
+
+   wvsp on 
+   type elas 
+   prop steel 7900 5900 3200
+   vdmp steel 1e+06 db 0.3 1.2 1e+06 1 0.01 1
+   symb eps = 1
+   symb aeps = $epvacm * $eps
+   elec steel $aeps 
+
+
+c -------------------------------------------------------------- 
+c type : METAL : 
+c name : stst : 
+c desc : Stainless Steel, generic : 
+c -------------------------------------------------------------- 
+
+
+   wvsp on 
+   type elas 
+   prop stst 0 0 0 
+
+
+   elec void $epvacm
+   end

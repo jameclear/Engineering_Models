@@ -1,0 +1,1549 @@
+mem 900						/* allocate 100 megawords of memory, 400 MegaBytes 
+c							/* NOTE:- Not needed for Windows versions
+c							/* MEM command must be first command in file, if used
+c
+c *************************************************************************************************************
+c
+c								FLEX INPUT FILE TEMPLATE
+c
+c *************************************************************************************************************
+c
+c 'Bare Bones' Example File
+c Contains basic commands that are essential, and those almost always used.
+c
+c DESIGNER		:
+c MODEL DESCRIPTION	: This is a flex input file generated from the SolidWorks interface
+c DATE CREATED	: 11 Nov 2010
+c VERSION		: 1.0
+c
+c *************************************************************************************************************
+
+symb ielec = 0 if noexist 			/* Sanity function for outputs 
+
+c **********************************************************************************************************
+c
+c 									GRID & GEOMETRY ALLOCATION 
+c
+c **********************************************************************************************************
+
+symb xstep1 = 0.0093435313
+symb xstep2 = 0.00059847546
+symb xstep3 = 0.0002564888
+symb xstep4 = 0.00034198666
+symb xstep5 = 0.0002564888
+symb xstep6 = 0.00034198666
+symb xstep7 = 0.0002564888
+symb xstep8 = 0.00034198666
+symb xstep9 = 0.0002564888
+symb xstep10 = 0.00034198666
+symb xstep11 = 0.0002564888
+symb xstep12 = 0.0003419857
+symb xstep13 = 0.00025648975
+symb xstep14 = 0.00034198475
+symb xstep15 = 0.00025649071
+symb xstep16 = 0.00059847546
+symb xstep17 = 0.018740207
+symb xstep18 = 0.00056387329
+symb xstep19 = 0.00056387711
+symb xstep20 = 0.00056387711
+symb xstep21 = 0.00048698425
+symb xstep22 = 7.6889038e-05
+symb xstep23 = 0.00048698425
+symb xstep24 = 7.6896667e-05
+symb xstep25 = 0.00048698044
+symb xstep26 = 7.6892853e-05
+symb xstep27 = 0.00048698425
+symb xstep28 = 7.6892853e-05
+symb xstep29 = 0.00048698425
+symb xstep30 = 0.00056387329
+symb xstep31 = 0.00056387711
+symb xstep32 = 0.00056387711
+symb xstep33 = 0.0051517792
+symb xstep34 = 0.00056387329
+symb xstep35 = 0.00056387329
+symb xstep36 = 0.00056388092
+symb xstep37 = 0.00048698044
+symb xstep38 = 7.6892853e-05
+symb xstep39 = 0.00048698425
+symb xstep40 = 7.6892853e-05
+symb xstep41 = 0.00048698425
+symb xstep42 = 7.6889038e-05
+symb xstep43 = 0.00048698425
+symb xstep44 = 7.6892853e-05
+symb xstep45 = 0.00048698807
+symb xstep46 = 7.6889038e-05
+symb xstep47 = 0.00048698425
+symb xstep48 = 7.6889038e-05
+symb xstep49 = 0.00048698425
+symb xstep50 = 7.6896667e-05
+symb xstep51 = 0.00048698425
+symb xstep52 = 7.6889038e-05
+symb xstep53 = 0.00048698425
+symb xstep54 = 7.6889038e-05
+symb xstep55 = 0.00048698807
+symb xstep56 = 7.6892853e-05
+symb xstep57 = 0.00048698425
+symb xstep58 = 7.6889038e-05
+symb xstep59 = 0.00048698425
+symb xstep60 = 7.6892853e-05
+symb xstep61 = 0.00048698425
+symb xstep62 = 0.00056387329
+symb xstep63 = 0.00056388092
+symb xstep64 = 0.00056387329
+symb xstep65 = 0.010387703
+symb xstep66 = 0.00049999237
+symb xstep67 = 0.0001000061
+symb xstep68 = 0.0005
+symb xstep69 = 9.9998474e-05
+symb xstep70 = 0.0005
+symb xstep71 = 9.9998474e-05
+symb xstep72 = 0.0005
+symb xstep73 = 9.9998474e-05
+symb xstep74 = 0.00050000763
+symb xstep75 = 9.9998474e-05
+symb xstep76 = 0.0005
+symb xstep77 = 9.9998474e-05
+symb xstep78 = 0.0005
+symb xstep79 = 9.9998474e-05
+symb xstep80 = 0.0005
+symb xstep81 = 0.0001000061
+symb xstep82 = 0.00049999237
+symb xstep83 = 9.9998474e-05
+symb xstep84 = 0.0005
+symb xstep85 = 0.0001000061
+symb xstep86 = 0.0005
+symb xstep87 = 9.9998474e-05
+symb xstep88 = 0.00049999237
+symb xstep89 = 0.0001000061
+symb xstep90 = 0.0005
+symb xstep91 = 9.9998474e-05
+symb xstep92 = 0.00050000763
+symb xstep93 = 9.9990845e-05
+symb xstep94 = 0.0005
+symb xstep95 = 0.0001000061
+symb xstep96 = 0.0005
+symb xstep97 = 9.9998474e-05
+symb xstep98 = 0.0005
+symb xstep99 = 9.9998474e-05
+symb xstep100 = 0.0005
+symb xstep101 = 9.9998474e-05
+symb xstep102 = 0.0005
+symb xstep103 = 0.0001000061
+symb xstep104 = 0.00049999237
+symb xstep105 = 9.9998474e-05
+symb xstep106 = 0.00050000763
+symb xstep107 = 9.9998474e-05
+symb xstep108 = 0.0005
+symb xstep109 = 0.0001000061
+symb xstep110 = 0.00049999237
+symb xstep111 = 9.9998474e-05
+symb xstep112 = 0.0005
+symb xstep113 = 0.0001000061
+symb xstep114 = 0.0005
+symb xstep115 = 9.9990845e-05
+symb xstep116 = 0.0005
+symb xstep117 = 0.0001000061
+symb xstep118 = 0.0005
+symb xstep119 = 9.9998474e-05
+symb xstep120 = 0.0005
+symb xstep121 = 9.9998474e-05
+symb xstep122 = 0.0005
+symb xstep123 = 9.9998474e-05
+symb xstep124 = 0.00050000763
+symb xstep125 = 9.9998474e-05
+symb xstep126 = 0.00049999237
+symb xstep127 = 0.0001000061
+symb xstep128 = 0.0005
+symb xstep129 = 0.010427696
+symb xstep130 = 0.00056387329
+symb xstep131 = 0.00056388092
+symb xstep132 = 0.00056388092
+symb xstep133 = 0.00048698425
+symb xstep134 = 7.6889038e-05
+symb xstep135 = 0.00048698425
+symb xstep136 = 7.6889038e-05
+symb xstep137 = 0.00048698425
+symb xstep138 = 7.6889038e-05
+symb xstep139 = 0.00048698425
+symb xstep140 = 7.6889038e-05
+symb xstep141 = 0.00048699188
+symb xstep142 = 7.6896667e-05
+symb xstep143 = 0.00048697662
+symb xstep144 = 7.6896667e-05
+symb xstep145 = 0.00048698425
+symb xstep146 = 7.6889038e-05
+symb xstep147 = 0.00048698425
+symb xstep148 = 7.6889038e-05
+symb xstep149 = 0.00048698425
+symb xstep150 = 7.6889038e-05
+symb xstep151 = 0.00048698425
+symb xstep152 = 7.6896667e-05
+symb xstep153 = 0.00048698425
+symb xstep154 = 7.6896667e-05
+symb xstep155 = 0.00048697662
+symb xstep156 = 7.6896667e-05
+symb xstep157 = 0.00048698425
+symb xstep158 = 0.00056387329
+symb xstep159 = 0.00056387329
+symb xstep160 = 0.00056388092
+symb xstep161 = 0.0051517792
+symb xstep162 = 0.00056387329
+symb xstep163 = 0.00056387329
+symb xstep164 = 0.00056387329
+symb xstep165 = 0.00048698425
+symb xstep166 = 7.6889038e-05
+symb xstep167 = 0.00048698425
+symb xstep168 = 7.6904297e-05
+symb xstep169 = 0.00048698425
+symb xstep170 = 7.6889038e-05
+symb xstep171 = 0.00048698425
+symb xstep172 = 7.6889038e-05
+symb xstep173 = 0.00048698425
+symb xstep174 = 0.00056387329
+symb xstep175 = 0.00056387329
+symb xstep176 = 0.00056388092
+symb xstep177 = 0.018740211
+symb xstep178 = 0.00059848022
+symb xstep179 = 0.00025646973
+symb xstep180 = 0.00034199524
+symb xstep181 = 0.00025648499
+symb xstep182 = 0.00034199524
+symb xstep183 = 0.00025648499
+symb xstep184 = 0.00034199524
+symb xstep185 = 0.00025646973
+symb xstep186 = 0.00034199524
+symb xstep187 = 0.00025648499
+symb xstep188 = 0.00034199524
+symb xstep189 = 0.00025648499
+symb xstep190 = 0.00034199524
+symb xstep191 = 0.00025646973
+symb xstep192 = 0.00059848022
+symb xstep193 = 0.0093435364
+
+symb x1 = 0.00085795057
+symb x2 = $x1 + $xstep1
+symb x3 = $x2 + $xstep2
+symb x4 = $x3 + $xstep3
+symb x5 = $x4 + $xstep4
+symb x6 = $x5 + $xstep5
+symb x7 = $x6 + $xstep6
+symb x8 = $x7 + $xstep7
+symb x9 = $x8 + $xstep8
+symb x10 = $x9 + $xstep9
+symb x11 = $x10 + $xstep10
+symb x12 = $x11 + $xstep11
+symb x13 = $x12 + $xstep12
+symb x14 = $x13 + $xstep13
+symb x15 = $x14 + $xstep14
+symb x16 = $x15 + $xstep15
+symb x17 = $x16 + $xstep16
+symb x18 = $x17 + $xstep17
+symb x19 = $x18 + $xstep18
+symb x20 = $x19 + $xstep19
+symb x21 = $x20 + $xstep20
+symb x22 = $x21 + $xstep21
+symb x23 = $x22 + $xstep22
+symb x24 = $x23 + $xstep23
+symb x25 = $x24 + $xstep24
+symb x26 = $x25 + $xstep25
+symb x27 = $x26 + $xstep26
+symb x28 = $x27 + $xstep27
+symb x29 = $x28 + $xstep28
+symb x30 = $x29 + $xstep29
+symb x31 = $x30 + $xstep30
+symb x32 = $x31 + $xstep31
+symb x33 = $x32 + $xstep32
+symb x34 = $x33 + $xstep33
+symb x35 = $x34 + $xstep34
+symb x36 = $x35 + $xstep35
+symb x37 = $x36 + $xstep36
+symb x38 = $x37 + $xstep37
+symb x39 = $x38 + $xstep38
+symb x40 = $x39 + $xstep39
+symb x41 = $x40 + $xstep40
+symb x42 = $x41 + $xstep41
+symb x43 = $x42 + $xstep42
+symb x44 = $x43 + $xstep43
+symb x45 = $x44 + $xstep44
+symb x46 = $x45 + $xstep45
+symb x47 = $x46 + $xstep46
+symb x48 = $x47 + $xstep47
+symb x49 = $x48 + $xstep48
+symb x50 = $x49 + $xstep49
+symb x51 = $x50 + $xstep50
+symb x52 = $x51 + $xstep51
+symb x53 = $x52 + $xstep52
+symb x54 = $x53 + $xstep53
+symb x55 = $x54 + $xstep54
+symb x56 = $x55 + $xstep55
+symb x57 = $x56 + $xstep56
+symb x58 = $x57 + $xstep57
+symb x59 = $x58 + $xstep58
+symb x60 = $x59 + $xstep59
+symb x61 = $x60 + $xstep60
+symb x62 = $x61 + $xstep61
+symb x63 = $x62 + $xstep62
+symb x64 = $x63 + $xstep63
+symb x65 = $x64 + $xstep64
+symb x66 = $x65 + $xstep65
+symb x67 = $x66 + $xstep66
+symb x68 = $x67 + $xstep67
+symb x69 = $x68 + $xstep68
+symb x70 = $x69 + $xstep69
+symb x71 = $x70 + $xstep70
+symb x72 = $x71 + $xstep71
+symb x73 = $x72 + $xstep72
+symb x74 = $x73 + $xstep73
+symb x75 = $x74 + $xstep74
+symb x76 = $x75 + $xstep75
+symb x77 = $x76 + $xstep76
+symb x78 = $x77 + $xstep77
+symb x79 = $x78 + $xstep78
+symb x80 = $x79 + $xstep79
+symb x81 = $x80 + $xstep80
+symb x82 = $x81 + $xstep81
+symb x83 = $x82 + $xstep82
+symb x84 = $x83 + $xstep83
+symb x85 = $x84 + $xstep84
+symb x86 = $x85 + $xstep85
+symb x87 = $x86 + $xstep86
+symb x88 = $x87 + $xstep87
+symb x89 = $x88 + $xstep88
+symb x90 = $x89 + $xstep89
+symb x91 = $x90 + $xstep90
+symb x92 = $x91 + $xstep91
+symb x93 = $x92 + $xstep92
+symb x94 = $x93 + $xstep93
+symb x95 = $x94 + $xstep94
+symb x96 = $x95 + $xstep95
+symb x97 = $x96 + $xstep96
+symb x98 = $x97 + $xstep97
+symb x99 = $x98 + $xstep98
+symb x100 = $x99 + $xstep99
+symb x101 = $x100 + $xstep100
+symb x102 = $x101 + $xstep101
+symb x103 = $x102 + $xstep102
+symb x104 = $x103 + $xstep103
+symb x105 = $x104 + $xstep104
+symb x106 = $x105 + $xstep105
+symb x107 = $x106 + $xstep106
+symb x108 = $x107 + $xstep107
+symb x109 = $x108 + $xstep108
+symb x110 = $x109 + $xstep109
+symb x111 = $x110 + $xstep110
+symb x112 = $x111 + $xstep111
+symb x113 = $x112 + $xstep112
+symb x114 = $x113 + $xstep113
+symb x115 = $x114 + $xstep114
+symb x116 = $x115 + $xstep115
+symb x117 = $x116 + $xstep116
+symb x118 = $x117 + $xstep117
+symb x119 = $x118 + $xstep118
+symb x120 = $x119 + $xstep119
+symb x121 = $x120 + $xstep120
+symb x122 = $x121 + $xstep121
+symb x123 = $x122 + $xstep122
+symb x124 = $x123 + $xstep123
+symb x125 = $x124 + $xstep124
+symb x126 = $x125 + $xstep125
+symb x127 = $x126 + $xstep126
+symb x128 = $x127 + $xstep127
+symb x129 = $x128 + $xstep128
+symb x130 = $x129 + $xstep129
+symb x131 = $x130 + $xstep130
+symb x132 = $x131 + $xstep131
+symb x133 = $x132 + $xstep132
+symb x134 = $x133 + $xstep133
+symb x135 = $x134 + $xstep134
+symb x136 = $x135 + $xstep135
+symb x137 = $x136 + $xstep136
+symb x138 = $x137 + $xstep137
+symb x139 = $x138 + $xstep138
+symb x140 = $x139 + $xstep139
+symb x141 = $x140 + $xstep140
+symb x142 = $x141 + $xstep141
+symb x143 = $x142 + $xstep142
+symb x144 = $x143 + $xstep143
+symb x145 = $x144 + $xstep144
+symb x146 = $x145 + $xstep145
+symb x147 = $x146 + $xstep146
+symb x148 = $x147 + $xstep147
+symb x149 = $x148 + $xstep148
+symb x150 = $x149 + $xstep149
+symb x151 = $x150 + $xstep150
+symb x152 = $x151 + $xstep151
+symb x153 = $x152 + $xstep152
+symb x154 = $x153 + $xstep153
+symb x155 = $x154 + $xstep154
+symb x156 = $x155 + $xstep155
+symb x157 = $x156 + $xstep156
+symb x158 = $x157 + $xstep157
+symb x159 = $x158 + $xstep158
+symb x160 = $x159 + $xstep159
+symb x161 = $x160 + $xstep160
+symb x162 = $x161 + $xstep161
+symb x163 = $x162 + $xstep162
+symb x164 = $x163 + $xstep163
+symb x165 = $x164 + $xstep164
+symb x166 = $x165 + $xstep165
+symb x167 = $x166 + $xstep166
+symb x168 = $x167 + $xstep167
+symb x169 = $x168 + $xstep168
+symb x170 = $x169 + $xstep169
+symb x171 = $x170 + $xstep170
+symb x172 = $x171 + $xstep171
+symb x173 = $x172 + $xstep172
+symb x174 = $x173 + $xstep173
+symb x175 = $x174 + $xstep174
+symb x176 = $x175 + $xstep175
+symb x177 = $x176 + $xstep176
+symb x178 = $x177 + $xstep177
+symb x179 = $x178 + $xstep178
+symb x180 = $x179 + $xstep179
+symb x181 = $x180 + $xstep180
+symb x182 = $x181 + $xstep181
+symb x183 = $x182 + $xstep182
+symb x184 = $x183 + $xstep183
+symb x185 = $x184 + $xstep184
+symb x186 = $x185 + $xstep185
+symb x187 = $x186 + $xstep186
+symb x188 = $x187 + $xstep187
+symb x189 = $x188 + $xstep188
+symb x190 = $x189 + $xstep189
+symb x191 = $x190 + $xstep190
+symb x192 = $x191 + $xstep191
+symb x193 = $x192 + $xstep192
+symb x194 = $x193 + $xstep193
+symb xmax = $x194
+
+symb ystep1 = 0.012192841
+symb ystep2 = 4.2747498e-05
+symb ystep3 = 4.2748451e-05
+symb ystep4 = 4.2748451e-05
+symb ystep5 = 4.2747498e-05
+symb ystep6 = 4.2749405e-05
+symb ystep7 = 4.2747498e-05
+symb ystep8 = 4.2748451e-05
+symb ystep9 = 0.004403101
+symb ystep10 = 0.0002050457
+symb ystep11 = 0.00011553192
+symb ystep12 = 4.2749405e-05
+symb ystep13 = 4.2747498e-05
+symb ystep14 = 4.0168762e-06
+symb ystep15 = 3.8730621e-05
+symb ystep16 = 4.2749405e-05
+symb ystep17 = 4.2747498e-05
+symb ystep18 = 4.2747498e-05
+symb ystep19 = 3.8070679e-05
+symb ystep20 = 4.6787262e-06
+symb ystep21 = 0.00020036697
+symb ystep22 = 0.0002050457
+symb ystep23 = 0.0002050457
+symb ystep24 = 0.0002050457
+symb ystep25 = 0.002665596
+symb ystep26 = 0.0002050457
+symb ystep27 = 0.0002050457
+symb ystep28 = 0.00020504761
+symb ystep29 = 0.0001537838
+symb ystep30 = 5.1261902e-05
+symb ystep31 = 0.0001537838
+symb ystep32 = 5.1261902e-05
+symb ystep33 = 0.0001537838
+symb ystep34 = 5.1261902e-05
+symb ystep35 = 0.0001537838
+symb ystep36 = 5.1261902e-05
+symb ystep37 = 0.0001537838
+symb ystep38 = 5.1261902e-05
+symb ystep39 = 0.00015378571
+symb ystep40 = 5.1259995e-05
+symb ystep41 = 0.0001537838
+symb ystep42 = 5.1261902e-05
+symb ystep43 = 0.0001537838
+symb ystep44 = 5.1261902e-05
+symb ystep45 = 0.0002050457
+symb ystep46 = 0.0002050457
+symb ystep47 = 0.0002050457
+symb ystep48 = 0.0002050457
+symb ystep49 = 0.0017941513
+symb ystep50 = 0.0002050457
+symb ystep51 = 0.0002050457
+symb ystep52 = 0.0002050457
+symb ystep53 = 0.0002050457
+symb ystep54 = 0.00020504761
+symb ystep55 = 0.0002050457
+symb ystep56 = 0.0002050457
+symb ystep57 = 0.0002050457
+symb ystep58 = 0.0002050457
+symb ystep59 = 0.0002050457
+symb ystep60 = 0.0002050457
+symb ystep61 = 0.00020504761
+symb ystep62 = 0.00020504379
+symb ystep63 = 0.0002050457
+symb ystep64 = 0.0002050457
+symb ystep65 = 0.1428839
+symb ystep66 = 1.5258789e-08
+symb ystep67 = 0.0049999847
+
+symb y1 = 0.00070514554
+symb y2 = $y1 + $ystep1
+symb y3 = $y2 + $ystep2
+symb y4 = $y3 + $ystep3
+symb y5 = $y4 + $ystep4
+symb y6 = $y5 + $ystep5
+symb y7 = $y6 + $ystep6
+symb y8 = $y7 + $ystep7
+symb y9 = $y8 + $ystep8
+symb y10 = $y9 + $ystep9
+symb y11 = $y10 + $ystep10
+symb y12 = $y11 + $ystep11
+symb y13 = $y12 + $ystep12
+symb y14 = $y13 + $ystep13
+symb y15 = $y14 + $ystep14
+symb y16 = $y15 + $ystep15
+symb y17 = $y16 + $ystep16
+symb y18 = $y17 + $ystep17
+symb y19 = $y18 + $ystep18
+symb y20 = $y19 + $ystep19
+symb y21 = $y20 + $ystep20
+symb y22 = $y21 + $ystep21
+symb y23 = $y22 + $ystep22
+symb y24 = $y23 + $ystep23
+symb y25 = $y24 + $ystep24
+symb y26 = $y25 + $ystep25
+symb y27 = $y26 + $ystep26
+symb y28 = $y27 + $ystep27
+symb y29 = $y28 + $ystep28
+symb y30 = $y29 + $ystep29
+symb y31 = $y30 + $ystep30
+symb y32 = $y31 + $ystep31
+symb y33 = $y32 + $ystep32
+symb y34 = $y33 + $ystep33
+symb y35 = $y34 + $ystep34
+symb y36 = $y35 + $ystep35
+symb y37 = $y36 + $ystep36
+symb y38 = $y37 + $ystep37
+symb y39 = $y38 + $ystep38
+symb y40 = $y39 + $ystep39
+symb y41 = $y40 + $ystep40
+symb y42 = $y41 + $ystep41
+symb y43 = $y42 + $ystep42
+symb y44 = $y43 + $ystep43
+symb y45 = $y44 + $ystep44
+symb y46 = $y45 + $ystep45
+symb y47 = $y46 + $ystep46
+symb y48 = $y47 + $ystep47
+symb y49 = $y48 + $ystep48
+symb y50 = $y49 + $ystep49
+symb y51 = $y50 + $ystep50
+symb y52 = $y51 + $ystep51
+symb y53 = $y52 + $ystep52
+symb y54 = $y53 + $ystep53
+symb y55 = $y54 + $ystep54
+symb y56 = $y55 + $ystep55
+symb y57 = $y56 + $ystep56
+symb y58 = $y57 + $ystep57
+symb y59 = $y58 + $ystep58
+symb y60 = $y59 + $ystep59
+symb y61 = $y60 + $ystep60
+symb y62 = $y61 + $ystep61
+symb y63 = $y62 + $ystep62
+symb y64 = $y63 + $ystep63
+symb y65 = $y64 + $ystep64
+symb y66 = $y65 + $ystep65
+symb y67 = $y66 + $ystep66
+symb y68 = $y67 + $ystep67
+symb ymax = $y68
+
+
+symb istep1 = 49
+symb istep2 = 4
+symb istep3 = 2
+symb istep4 = 2
+symb istep5 = 2
+symb istep6 = 2
+symb istep7 = 2
+symb istep8 = 2
+symb istep9 = 2
+symb istep10 = 2
+symb istep11 = 2
+symb istep12 = 2
+symb istep13 = 2
+symb istep14 = 2
+symb istep15 = 2
+symb istep16 = 4
+symb istep17 = 98
+symb istep18 = 3
+symb istep19 = 3
+symb istep20 = 3
+symb istep21 = 3
+symb istep22 = 1
+symb istep23 = 3
+symb istep24 = 1
+symb istep25 = 3
+symb istep26 = 1
+symb istep27 = 3
+symb istep28 = 1
+symb istep29 = 3
+symb istep30 = 3
+symb istep31 = 3
+symb istep32 = 3
+symb istep33 = 27
+symb istep34 = 3
+symb istep35 = 3
+symb istep36 = 3
+symb istep37 = 3
+symb istep38 = 1
+symb istep39 = 3
+symb istep40 = 1
+symb istep41 = 3
+symb istep42 = 1
+symb istep43 = 3
+symb istep44 = 1
+symb istep45 = 3
+symb istep46 = 1
+symb istep47 = 3
+symb istep48 = 1
+symb istep49 = 3
+symb istep50 = 1
+symb istep51 = 3
+symb istep52 = 1
+symb istep53 = 3
+symb istep54 = 1
+symb istep55 = 3
+symb istep56 = 1
+symb istep57 = 3
+symb istep58 = 1
+symb istep59 = 3
+symb istep60 = 1
+symb istep61 = 3
+symb istep62 = 3
+symb istep63 = 3
+symb istep64 = 3
+symb istep65 = 54
+symb istep66 = 3
+symb istep67 = 1
+symb istep68 = 3
+symb istep69 = 1
+symb istep70 = 3
+symb istep71 = 1
+symb istep72 = 3
+symb istep73 = 1
+symb istep74 = 3
+symb istep75 = 1
+symb istep76 = 3
+symb istep77 = 1
+symb istep78 = 3
+symb istep79 = 1
+symb istep80 = 3
+symb istep81 = 1
+symb istep82 = 3
+symb istep83 = 1
+symb istep84 = 3
+symb istep85 = 1
+symb istep86 = 3
+symb istep87 = 1
+symb istep88 = 3
+symb istep89 = 1
+symb istep90 = 3
+symb istep91 = 1
+symb istep92 = 3
+symb istep93 = 1
+symb istep94 = 3
+symb istep95 = 1
+symb istep96 = 3
+symb istep97 = 1
+symb istep98 = 3
+symb istep99 = 1
+symb istep100 = 3
+symb istep101 = 1
+symb istep102 = 3
+symb istep103 = 1
+symb istep104 = 3
+symb istep105 = 1
+symb istep106 = 3
+symb istep107 = 1
+symb istep108 = 3
+symb istep109 = 1
+symb istep110 = 3
+symb istep111 = 1
+symb istep112 = 3
+symb istep113 = 1
+symb istep114 = 3
+symb istep115 = 1
+symb istep116 = 3
+symb istep117 = 1
+symb istep118 = 3
+symb istep119 = 1
+symb istep120 = 3
+symb istep121 = 1
+symb istep122 = 3
+symb istep123 = 1
+symb istep124 = 3
+symb istep125 = 1
+symb istep126 = 3
+symb istep127 = 1
+symb istep128 = 3
+symb istep129 = 55
+symb istep130 = 3
+symb istep131 = 3
+symb istep132 = 3
+symb istep133 = 3
+symb istep134 = 1
+symb istep135 = 3
+symb istep136 = 1
+symb istep137 = 3
+symb istep138 = 1
+symb istep139 = 3
+symb istep140 = 1
+symb istep141 = 3
+symb istep142 = 1
+symb istep143 = 3
+symb istep144 = 1
+symb istep145 = 3
+symb istep146 = 1
+symb istep147 = 3
+symb istep148 = 1
+symb istep149 = 3
+symb istep150 = 1
+symb istep151 = 3
+symb istep152 = 1
+symb istep153 = 3
+symb istep154 = 1
+symb istep155 = 3
+symb istep156 = 1
+symb istep157 = 3
+symb istep158 = 3
+symb istep159 = 3
+symb istep160 = 3
+symb istep161 = 27
+symb istep162 = 3
+symb istep163 = 3
+symb istep164 = 3
+symb istep165 = 3
+symb istep166 = 1
+symb istep167 = 3
+symb istep168 = 1
+symb istep169 = 3
+symb istep170 = 1
+symb istep171 = 3
+symb istep172 = 1
+symb istep173 = 3
+symb istep174 = 3
+symb istep175 = 3
+symb istep176 = 3
+symb istep177 = 98
+symb istep178 = 4
+symb istep179 = 2
+symb istep180 = 2
+symb istep181 = 2
+symb istep182 = 2
+symb istep183 = 2
+symb istep184 = 2
+symb istep185 = 2
+symb istep186 = 2
+symb istep187 = 2
+symb istep188 = 2
+symb istep189 = 2
+symb istep190 = 2
+symb istep191 = 2
+symb istep192 = 4
+symb istep193 = 49
+
+symb jstep1 = 64
+symb jstep2 = 1
+symb jstep3 = 1
+symb jstep4 = 1
+symb jstep5 = 1
+symb jstep6 = 1
+symb jstep7 = 1
+symb jstep8 = 1
+symb jstep9 = 23
+symb jstep10 = 2
+symb jstep11 = 1
+symb jstep12 = 1
+symb jstep13 = 1
+symb jstep14 = 1
+symb jstep15 = 1
+symb jstep16 = 1
+symb jstep17 = 1
+symb jstep18 = 1
+symb jstep19 = 1
+symb jstep20 = 1
+symb jstep21 = 2
+symb jstep22 = 2
+symb jstep23 = 2
+symb jstep24 = 2
+symb jstep25 = 14
+symb jstep26 = 2
+symb jstep27 = 2
+symb jstep28 = 2
+symb jstep29 = 1
+symb jstep30 = 1
+symb jstep31 = 1
+symb jstep32 = 1
+symb jstep33 = 1
+symb jstep34 = 1
+symb jstep35 = 1
+symb jstep36 = 1
+symb jstep37 = 1
+symb jstep38 = 1
+symb jstep39 = 1
+symb jstep40 = 1
+symb jstep41 = 1
+symb jstep42 = 1
+symb jstep43 = 1
+symb jstep44 = 1
+symb jstep45 = 2
+symb jstep46 = 2
+symb jstep47 = 2
+symb jstep48 = 2
+symb jstep49 = 10
+symb jstep50 = 2
+symb jstep51 = 2
+symb jstep52 = 2
+symb jstep53 = 2
+symb jstep54 = 2
+symb jstep55 = 2
+symb jstep56 = 2
+symb jstep57 = 2
+symb jstep58 = 2
+symb jstep59 = 2
+symb jstep60 = 2
+symb jstep61 = 2
+symb jstep62 = 2
+symb jstep63 = 2
+symb jstep64 = 2
+symb jstep65 = 741
+symb jstep66 = 1
+symb jstep67 = 26
+
+symb i1 = 1
+symb i2 = $i1 + $istep1
+symb i3 = $i2 + $istep2
+symb i4 = $i3 + $istep3
+symb i5 = $i4 + $istep4
+symb i6 = $i5 + $istep5
+symb i7 = $i6 + $istep6
+symb i8 = $i7 + $istep7
+symb i9 = $i8 + $istep8
+symb i10 = $i9 + $istep9
+symb i11 = $i10 + $istep10
+symb i12 = $i11 + $istep11
+symb i13 = $i12 + $istep12
+symb i14 = $i13 + $istep13
+symb i15 = $i14 + $istep14
+symb i16 = $i15 + $istep15
+symb i17 = $i16 + $istep16
+symb i18 = $i17 + $istep17
+symb i19 = $i18 + $istep18
+symb i20 = $i19 + $istep19
+symb i21 = $i20 + $istep20
+symb i22 = $i21 + $istep21
+symb i23 = $i22 + $istep22
+symb i24 = $i23 + $istep23
+symb i25 = $i24 + $istep24
+symb i26 = $i25 + $istep25
+symb i27 = $i26 + $istep26
+symb i28 = $i27 + $istep27
+symb i29 = $i28 + $istep28
+symb i30 = $i29 + $istep29
+symb i31 = $i30 + $istep30
+symb i32 = $i31 + $istep31
+symb i33 = $i32 + $istep32
+symb i34 = $i33 + $istep33
+symb i35 = $i34 + $istep34
+symb i36 = $i35 + $istep35
+symb i37 = $i36 + $istep36
+symb i38 = $i37 + $istep37
+symb i39 = $i38 + $istep38
+symb i40 = $i39 + $istep39
+symb i41 = $i40 + $istep40
+symb i42 = $i41 + $istep41
+symb i43 = $i42 + $istep42
+symb i44 = $i43 + $istep43
+symb i45 = $i44 + $istep44
+symb i46 = $i45 + $istep45
+symb i47 = $i46 + $istep46
+symb i48 = $i47 + $istep47
+symb i49 = $i48 + $istep48
+symb i50 = $i49 + $istep49
+symb i51 = $i50 + $istep50
+symb i52 = $i51 + $istep51
+symb i53 = $i52 + $istep52
+symb i54 = $i53 + $istep53
+symb i55 = $i54 + $istep54
+symb i56 = $i55 + $istep55
+symb i57 = $i56 + $istep56
+symb i58 = $i57 + $istep57
+symb i59 = $i58 + $istep58
+symb i60 = $i59 + $istep59
+symb i61 = $i60 + $istep60
+symb i62 = $i61 + $istep61
+symb i63 = $i62 + $istep62
+symb i64 = $i63 + $istep63
+symb i65 = $i64 + $istep64
+symb i66 = $i65 + $istep65
+symb i67 = $i66 + $istep66
+symb i68 = $i67 + $istep67
+symb i69 = $i68 + $istep68
+symb i70 = $i69 + $istep69
+symb i71 = $i70 + $istep70
+symb i72 = $i71 + $istep71
+symb i73 = $i72 + $istep72
+symb i74 = $i73 + $istep73
+symb i75 = $i74 + $istep74
+symb i76 = $i75 + $istep75
+symb i77 = $i76 + $istep76
+symb i78 = $i77 + $istep77
+symb i79 = $i78 + $istep78
+symb i80 = $i79 + $istep79
+symb i81 = $i80 + $istep80
+symb i82 = $i81 + $istep81
+symb i83 = $i82 + $istep82
+symb i84 = $i83 + $istep83
+symb i85 = $i84 + $istep84
+symb i86 = $i85 + $istep85
+symb i87 = $i86 + $istep86
+symb i88 = $i87 + $istep87
+symb i89 = $i88 + $istep88
+symb i90 = $i89 + $istep89
+symb i91 = $i90 + $istep90
+symb i92 = $i91 + $istep91
+symb i93 = $i92 + $istep92
+symb i94 = $i93 + $istep93
+symb i95 = $i94 + $istep94
+symb i96 = $i95 + $istep95
+symb i97 = $i96 + $istep96
+symb i98 = $i97 + $istep97
+symb i99 = $i98 + $istep98
+symb i100 = $i99 + $istep99
+symb i101 = $i100 + $istep100
+symb i102 = $i101 + $istep101
+symb i103 = $i102 + $istep102
+symb i104 = $i103 + $istep103
+symb i105 = $i104 + $istep104
+symb i106 = $i105 + $istep105
+symb i107 = $i106 + $istep106
+symb i108 = $i107 + $istep107
+symb i109 = $i108 + $istep108
+symb i110 = $i109 + $istep109
+symb i111 = $i110 + $istep110
+symb i112 = $i111 + $istep111
+symb i113 = $i112 + $istep112
+symb i114 = $i113 + $istep113
+symb i115 = $i114 + $istep114
+symb i116 = $i115 + $istep115
+symb i117 = $i116 + $istep116
+symb i118 = $i117 + $istep117
+symb i119 = $i118 + $istep118
+symb i120 = $i119 + $istep119
+symb i121 = $i120 + $istep120
+symb i122 = $i121 + $istep121
+symb i123 = $i122 + $istep122
+symb i124 = $i123 + $istep123
+symb i125 = $i124 + $istep124
+symb i126 = $i125 + $istep125
+symb i127 = $i126 + $istep126
+symb i128 = $i127 + $istep127
+symb i129 = $i128 + $istep128
+symb i130 = $i129 + $istep129
+symb i131 = $i130 + $istep130
+symb i132 = $i131 + $istep131
+symb i133 = $i132 + $istep132
+symb i134 = $i133 + $istep133
+symb i135 = $i134 + $istep134
+symb i136 = $i135 + $istep135
+symb i137 = $i136 + $istep136
+symb i138 = $i137 + $istep137
+symb i139 = $i138 + $istep138
+symb i140 = $i139 + $istep139
+symb i141 = $i140 + $istep140
+symb i142 = $i141 + $istep141
+symb i143 = $i142 + $istep142
+symb i144 = $i143 + $istep143
+symb i145 = $i144 + $istep144
+symb i146 = $i145 + $istep145
+symb i147 = $i146 + $istep146
+symb i148 = $i147 + $istep147
+symb i149 = $i148 + $istep148
+symb i150 = $i149 + $istep149
+symb i151 = $i150 + $istep150
+symb i152 = $i151 + $istep151
+symb i153 = $i152 + $istep152
+symb i154 = $i153 + $istep153
+symb i155 = $i154 + $istep154
+symb i156 = $i155 + $istep155
+symb i157 = $i156 + $istep156
+symb i158 = $i157 + $istep157
+symb i159 = $i158 + $istep158
+symb i160 = $i159 + $istep159
+symb i161 = $i160 + $istep160
+symb i162 = $i161 + $istep161
+symb i163 = $i162 + $istep162
+symb i164 = $i163 + $istep163
+symb i165 = $i164 + $istep164
+symb i166 = $i165 + $istep165
+symb i167 = $i166 + $istep166
+symb i168 = $i167 + $istep167
+symb i169 = $i168 + $istep168
+symb i170 = $i169 + $istep169
+symb i171 = $i170 + $istep170
+symb i172 = $i171 + $istep171
+symb i173 = $i172 + $istep172
+symb i174 = $i173 + $istep173
+symb i175 = $i174 + $istep174
+symb i176 = $i175 + $istep175
+symb i177 = $i176 + $istep176
+symb i178 = $i177 + $istep177
+symb i179 = $i178 + $istep178
+symb i180 = $i179 + $istep179
+symb i181 = $i180 + $istep180
+symb i182 = $i181 + $istep181
+symb i183 = $i182 + $istep182
+symb i184 = $i183 + $istep183
+symb i185 = $i184 + $istep184
+symb i186 = $i185 + $istep185
+symb i187 = $i186 + $istep186
+symb i188 = $i187 + $istep187
+symb i189 = $i188 + $istep188
+symb i190 = $i189 + $istep189
+symb i191 = $i190 + $istep190
+symb i192 = $i191 + $istep191
+symb i193 = $i192 + $istep192
+symb i194 = $i193 + $istep193
+symb indgrd = $i194
+
+symb j1 = 1
+symb j2 = $j1 + $jstep1
+symb j3 = $j2 + $jstep2
+symb j4 = $j3 + $jstep3
+symb j5 = $j4 + $jstep4
+symb j6 = $j5 + $jstep5
+symb j7 = $j6 + $jstep6
+symb j8 = $j7 + $jstep7
+symb j9 = $j8 + $jstep8
+symb j10 = $j9 + $jstep9
+symb j11 = $j10 + $jstep10
+symb j12 = $j11 + $jstep11
+symb j13 = $j12 + $jstep12
+symb j14 = $j13 + $jstep13
+symb j15 = $j14 + $jstep14
+symb j16 = $j15 + $jstep15
+symb j17 = $j16 + $jstep16
+symb j18 = $j17 + $jstep17
+symb j19 = $j18 + $jstep18
+symb j20 = $j19 + $jstep19
+symb j21 = $j20 + $jstep20
+symb j22 = $j21 + $jstep21
+symb j23 = $j22 + $jstep22
+symb j24 = $j23 + $jstep23
+symb j25 = $j24 + $jstep24
+symb j26 = $j25 + $jstep25
+symb j27 = $j26 + $jstep26
+symb j28 = $j27 + $jstep27
+symb j29 = $j28 + $jstep28
+symb j30 = $j29 + $jstep29
+symb j31 = $j30 + $jstep30
+symb j32 = $j31 + $jstep31
+symb j33 = $j32 + $jstep32
+symb j34 = $j33 + $jstep33
+symb j35 = $j34 + $jstep34
+symb j36 = $j35 + $jstep35
+symb j37 = $j36 + $jstep36
+symb j38 = $j37 + $jstep37
+symb j39 = $j38 + $jstep38
+symb j40 = $j39 + $jstep39
+symb j41 = $j40 + $jstep40
+symb j42 = $j41 + $jstep41
+symb j43 = $j42 + $jstep42
+symb j44 = $j43 + $jstep43
+symb j45 = $j44 + $jstep44
+symb j46 = $j45 + $jstep45
+symb j47 = $j46 + $jstep46
+symb j48 = $j47 + $jstep47
+symb j49 = $j48 + $jstep48
+symb j50 = $j49 + $jstep49
+symb j51 = $j50 + $jstep50
+symb j52 = $j51 + $jstep51
+symb j53 = $j52 + $jstep52
+symb j54 = $j53 + $jstep53
+symb j55 = $j54 + $jstep54
+symb j56 = $j55 + $jstep55
+symb j57 = $j56 + $jstep56
+symb j58 = $j57 + $jstep57
+symb j59 = $j58 + $jstep58
+symb j60 = $j59 + $jstep59
+symb j61 = $j60 + $jstep60
+symb j62 = $j61 + $jstep61
+symb j63 = $j62 + $jstep62
+symb j64 = $j63 + $jstep63
+symb j65 = $j64 + $jstep64
+symb j66 = $j65 + $jstep65
+symb j67 = $j66 + $jstep66
+symb j68 = $j67 + $jstep67
+symb jndgrd = $j68
+
+grid $indgrd $jndgrd
+
+geom
+  xcrd $x1 $x2 $i1 $i2
+  xcrd $x2 $x3 $i2 $i3
+  xcrd $x3 $x4 $i3 $i4
+  xcrd $x4 $x5 $i4 $i5
+  xcrd $x5 $x6 $i5 $i6
+  xcrd $x6 $x7 $i6 $i7
+  xcrd $x7 $x8 $i7 $i8
+  xcrd $x8 $x9 $i8 $i9
+  xcrd $x9 $x10 $i9 $i10
+  xcrd $x10 $x11 $i10 $i11
+  xcrd $x11 $x12 $i11 $i12
+  xcrd $x12 $x13 $i12 $i13
+  xcrd $x13 $x14 $i13 $i14
+  xcrd $x14 $x15 $i14 $i15
+  xcrd $x15 $x16 $i15 $i16
+  xcrd $x16 $x17 $i16 $i17
+  xcrd $x17 $x18 $i17 $i18
+  xcrd $x18 $x19 $i18 $i19
+  xcrd $x19 $x20 $i19 $i20
+  xcrd $x20 $x21 $i20 $i21
+  xcrd $x21 $x22 $i21 $i22
+  xcrd $x22 $x23 $i22 $i23
+  xcrd $x23 $x24 $i23 $i24
+  xcrd $x24 $x25 $i24 $i25
+  xcrd $x25 $x26 $i25 $i26
+  xcrd $x26 $x27 $i26 $i27
+  xcrd $x27 $x28 $i27 $i28
+  xcrd $x28 $x29 $i28 $i29
+  xcrd $x29 $x30 $i29 $i30
+  xcrd $x30 $x31 $i30 $i31
+  xcrd $x31 $x32 $i31 $i32
+  xcrd $x32 $x33 $i32 $i33
+  xcrd $x33 $x34 $i33 $i34
+  xcrd $x34 $x35 $i34 $i35
+  xcrd $x35 $x36 $i35 $i36
+  xcrd $x36 $x37 $i36 $i37
+  xcrd $x37 $x38 $i37 $i38
+  xcrd $x38 $x39 $i38 $i39
+  xcrd $x39 $x40 $i39 $i40
+  xcrd $x40 $x41 $i40 $i41
+  xcrd $x41 $x42 $i41 $i42
+  xcrd $x42 $x43 $i42 $i43
+  xcrd $x43 $x44 $i43 $i44
+  xcrd $x44 $x45 $i44 $i45
+  xcrd $x45 $x46 $i45 $i46
+  xcrd $x46 $x47 $i46 $i47
+  xcrd $x47 $x48 $i47 $i48
+  xcrd $x48 $x49 $i48 $i49
+  xcrd $x49 $x50 $i49 $i50
+  xcrd $x50 $x51 $i50 $i51
+  xcrd $x51 $x52 $i51 $i52
+  xcrd $x52 $x53 $i52 $i53
+  xcrd $x53 $x54 $i53 $i54
+  xcrd $x54 $x55 $i54 $i55
+  xcrd $x55 $x56 $i55 $i56
+  xcrd $x56 $x57 $i56 $i57
+  xcrd $x57 $x58 $i57 $i58
+  xcrd $x58 $x59 $i58 $i59
+  xcrd $x59 $x60 $i59 $i60
+  xcrd $x60 $x61 $i60 $i61
+  xcrd $x61 $x62 $i61 $i62
+  xcrd $x62 $x63 $i62 $i63
+  xcrd $x63 $x64 $i63 $i64
+  xcrd $x64 $x65 $i64 $i65
+  xcrd $x65 $x66 $i65 $i66
+  xcrd $x66 $x67 $i66 $i67
+  xcrd $x67 $x68 $i67 $i68
+  xcrd $x68 $x69 $i68 $i69
+  xcrd $x69 $x70 $i69 $i70
+  xcrd $x70 $x71 $i70 $i71
+  xcrd $x71 $x72 $i71 $i72
+  xcrd $x72 $x73 $i72 $i73
+  xcrd $x73 $x74 $i73 $i74
+  xcrd $x74 $x75 $i74 $i75
+  xcrd $x75 $x76 $i75 $i76
+  xcrd $x76 $x77 $i76 $i77
+  xcrd $x77 $x78 $i77 $i78
+  xcrd $x78 $x79 $i78 $i79
+  xcrd $x79 $x80 $i79 $i80
+  xcrd $x80 $x81 $i80 $i81
+  xcrd $x81 $x82 $i81 $i82
+  xcrd $x82 $x83 $i82 $i83
+  xcrd $x83 $x84 $i83 $i84
+  xcrd $x84 $x85 $i84 $i85
+  xcrd $x85 $x86 $i85 $i86
+  xcrd $x86 $x87 $i86 $i87
+  xcrd $x87 $x88 $i87 $i88
+  xcrd $x88 $x89 $i88 $i89
+  xcrd $x89 $x90 $i89 $i90
+  xcrd $x90 $x91 $i90 $i91
+  xcrd $x91 $x92 $i91 $i92
+  xcrd $x92 $x93 $i92 $i93
+  xcrd $x93 $x94 $i93 $i94
+  xcrd $x94 $x95 $i94 $i95
+  xcrd $x95 $x96 $i95 $i96
+  xcrd $x96 $x97 $i96 $i97
+  xcrd $x97 $x98 $i97 $i98
+  xcrd $x98 $x99 $i98 $i99
+  xcrd $x99 $x100 $i99 $i100
+  xcrd $x100 $x101 $i100 $i101
+  xcrd $x101 $x102 $i101 $i102
+  xcrd $x102 $x103 $i102 $i103
+  xcrd $x103 $x104 $i103 $i104
+  xcrd $x104 $x105 $i104 $i105
+  xcrd $x105 $x106 $i105 $i106
+  xcrd $x106 $x107 $i106 $i107
+  xcrd $x107 $x108 $i107 $i108
+  xcrd $x108 $x109 $i108 $i109
+  xcrd $x109 $x110 $i109 $i110
+  xcrd $x110 $x111 $i110 $i111
+  xcrd $x111 $x112 $i111 $i112
+  xcrd $x112 $x113 $i112 $i113
+  xcrd $x113 $x114 $i113 $i114
+  xcrd $x114 $x115 $i114 $i115
+  xcrd $x115 $x116 $i115 $i116
+  xcrd $x116 $x117 $i116 $i117
+  xcrd $x117 $x118 $i117 $i118
+  xcrd $x118 $x119 $i118 $i119
+  xcrd $x119 $x120 $i119 $i120
+  xcrd $x120 $x121 $i120 $i121
+  xcrd $x121 $x122 $i121 $i122
+  xcrd $x122 $x123 $i122 $i123
+  xcrd $x123 $x124 $i123 $i124
+  xcrd $x124 $x125 $i124 $i125
+  xcrd $x125 $x126 $i125 $i126
+  xcrd $x126 $x127 $i126 $i127
+  xcrd $x127 $x128 $i127 $i128
+  xcrd $x128 $x129 $i128 $i129
+  xcrd $x129 $x130 $i129 $i130
+  xcrd $x130 $x131 $i130 $i131
+  xcrd $x131 $x132 $i131 $i132
+  xcrd $x132 $x133 $i132 $i133
+  xcrd $x133 $x134 $i133 $i134
+  xcrd $x134 $x135 $i134 $i135
+  xcrd $x135 $x136 $i135 $i136
+  xcrd $x136 $x137 $i136 $i137
+  xcrd $x137 $x138 $i137 $i138
+  xcrd $x138 $x139 $i138 $i139
+  xcrd $x139 $x140 $i139 $i140
+  xcrd $x140 $x141 $i140 $i141
+  xcrd $x141 $x142 $i141 $i142
+  xcrd $x142 $x143 $i142 $i143
+  xcrd $x143 $x144 $i143 $i144
+  xcrd $x144 $x145 $i144 $i145
+  xcrd $x145 $x146 $i145 $i146
+  xcrd $x146 $x147 $i146 $i147
+  xcrd $x147 $x148 $i147 $i148
+  xcrd $x148 $x149 $i148 $i149
+  xcrd $x149 $x150 $i149 $i150
+  xcrd $x150 $x151 $i150 $i151
+  xcrd $x151 $x152 $i151 $i152
+  xcrd $x152 $x153 $i152 $i153
+  xcrd $x153 $x154 $i153 $i154
+  xcrd $x154 $x155 $i154 $i155
+  xcrd $x155 $x156 $i155 $i156
+  xcrd $x156 $x157 $i156 $i157
+  xcrd $x157 $x158 $i157 $i158
+  xcrd $x158 $x159 $i158 $i159
+  xcrd $x159 $x160 $i159 $i160
+  xcrd $x160 $x161 $i160 $i161
+  xcrd $x161 $x162 $i161 $i162
+  xcrd $x162 $x163 $i162 $i163
+  xcrd $x163 $x164 $i163 $i164
+  xcrd $x164 $x165 $i164 $i165
+  xcrd $x165 $x166 $i165 $i166
+  xcrd $x166 $x167 $i166 $i167
+  xcrd $x167 $x168 $i167 $i168
+  xcrd $x168 $x169 $i168 $i169
+  xcrd $x169 $x170 $i169 $i170
+  xcrd $x170 $x171 $i170 $i171
+  xcrd $x171 $x172 $i171 $i172
+  xcrd $x172 $x173 $i172 $i173
+  xcrd $x173 $x174 $i173 $i174
+  xcrd $x174 $x175 $i174 $i175
+  xcrd $x175 $x176 $i175 $i176
+  xcrd $x176 $x177 $i176 $i177
+  xcrd $x177 $x178 $i177 $i178
+  xcrd $x178 $x179 $i178 $i179
+  xcrd $x179 $x180 $i179 $i180
+  xcrd $x180 $x181 $i180 $i181
+  xcrd $x181 $x182 $i181 $i182
+  xcrd $x182 $x183 $i182 $i183
+  xcrd $x183 $x184 $i183 $i184
+  xcrd $x184 $x185 $i184 $i185
+  xcrd $x185 $x186 $i185 $i186
+  xcrd $x186 $x187 $i186 $i187
+  xcrd $x187 $x188 $i187 $i188
+  xcrd $x188 $x189 $i188 $i189
+  xcrd $x189 $x190 $i189 $i190
+  xcrd $x190 $x191 $i190 $i191
+  xcrd $x191 $x192 $i191 $i192
+  xcrd $x192 $x193 $i192 $i193
+  xcrd $x193 $x194 $i193 $i194
+  ycrd $y1 $y2 $j1 $j2
+  ycrd $y2 $y3 $j2 $j3
+  ycrd $y3 $y4 $j3 $j4
+  ycrd $y4 $y5 $j4 $j5
+  ycrd $y5 $y6 $j5 $j6
+  ycrd $y6 $y7 $j6 $j7
+  ycrd $y7 $y8 $j7 $j8
+  ycrd $y8 $y9 $j8 $j9
+  ycrd $y9 $y10 $j9 $j10
+  ycrd $y10 $y11 $j10 $j11
+  ycrd $y11 $y12 $j11 $j12
+  ycrd $y12 $y13 $j12 $j13
+  ycrd $y13 $y14 $j13 $j14
+  ycrd $y14 $y15 $j14 $j15
+  ycrd $y15 $y16 $j15 $j16
+  ycrd $y16 $y17 $j16 $j17
+  ycrd $y17 $y18 $j17 $j18
+  ycrd $y18 $y19 $j18 $j19
+  ycrd $y19 $y20 $j19 $j20
+  ycrd $y20 $y21 $j20 $j21
+  ycrd $y21 $y22 $j21 $j22
+  ycrd $y22 $y23 $j22 $j23
+  ycrd $y23 $y24 $j23 $j24
+  ycrd $y24 $y25 $j24 $j25
+  ycrd $y25 $y26 $j25 $j26
+  ycrd $y26 $y27 $j26 $j27
+  ycrd $y27 $y28 $j27 $j28
+  ycrd $y28 $y29 $j28 $j29
+  ycrd $y29 $y30 $j29 $j30
+  ycrd $y30 $y31 $j30 $j31
+  ycrd $y31 $y32 $j31 $j32
+  ycrd $y32 $y33 $j32 $j33
+  ycrd $y33 $y34 $j33 $j34
+  ycrd $y34 $y35 $j34 $j35
+  ycrd $y35 $y36 $j35 $j36
+  ycrd $y36 $y37 $j36 $j37
+  ycrd $y37 $y38 $j37 $j38
+  ycrd $y38 $y39 $j38 $j39
+  ycrd $y39 $y40 $j39 $j40
+  ycrd $y40 $y41 $j40 $j41
+  ycrd $y41 $y42 $j41 $j42
+  ycrd $y42 $y43 $j42 $j43
+  ycrd $y43 $y44 $j43 $j44
+  ycrd $y44 $y45 $j44 $j45
+  ycrd $y45 $y46 $j45 $j46
+  ycrd $y46 $y47 $j46 $j47
+  ycrd $y47 $y48 $j47 $j48
+  ycrd $y48 $y49 $j48 $j49
+  ycrd $y49 $y50 $j49 $j50
+  ycrd $y50 $y51 $j50 $j51
+  ycrd $y51 $y52 $j51 $j52
+  ycrd $y52 $y53 $j52 $j53
+  ycrd $y53 $y54 $j53 $j54
+  ycrd $y54 $y55 $j54 $j55
+  ycrd $y55 $y56 $j55 $j56
+  ycrd $y56 $y57 $j56 $j57
+  ycrd $y57 $y58 $j57 $j58
+  ycrd $y58 $y59 $j58 $j59
+  ycrd $y59 $y60 $j59 $j60
+  ycrd $y60 $y61 $j60 $j61
+  ycrd $y61 $y62 $j61 $j62
+  ycrd $y62 $y63 $j62 $j63
+  ycrd $y63 $y64 $j63 $j64
+  ycrd $y64 $y65 $j64 $j65
+  ycrd $y65 $y66 $j65 $j66
+  ycrd $y66 $y67 $j66 $j67
+  ycrd $y67 $y68 $j67 $j68
+  end
+
+c **********************************************************************************************************
+c
+c 									DRIVING CONDITIONS 
+c
+c **********************************************************************************************************
+c
+c	A number of predefined waveform functions can be accessed in PZFlex.
+c 	The SINE wave option is used below, other examples include wavelets, gaussians,
+c 	and step functions. The manual details the function entries
+c
+c *********************************************************************************************************
+
+symb freqint = 2000000
+func blak $freqint 1 0. 
+
+symb freqdamp = $freqint
+
+c **********************************************************************************************************
+c
+c 									MATERIAL PROPERTIES
+c
+c **********************************************************************************************************
+c
+c	While Material names and Properties can be specified within the Flex input file
+c	it is usually good practice to maintain a separate 'materials file' that is then
+c	read into the Flex input file. This is the method used here, the materials file 
+c	has been supplied by the Solidworks Importation tool and the project list in FlexLAB.
+c
+c **********************************************************************************************************
+
+symb #read rail_2d_5mm.prjmat
+
+c ************************************************************************************************************
+c
+c									MODEL PARAMETERS
+c
+c ************************************************************************************************************
+c
+c 	Solidworks has been used to simplify the model building phase. The resultant meshed model has been
+c	saved as a binary file for pzflex and is now being read in.
+c
+c ************************************************************************************************************
+c
+c							SOLIDWORKS BINARY MESHED MODEL FILE 
+c
+c ************************************************************************************************************
+
+site
+	tabl in rail_2d_5mm.flxtbl 1 0. 0. 0. 1 $indgrd 1 $jndgrd
+	end
+
+c **********************************************************************************************************
+c
+c 									BOUNDARY CONDITIONS 
+c
+c **********************************************************************************************************
+c
+c	How the model interacts with the 'rest of the world'
+c	Commonly used for symmetry (SYMM) and infinite absorbing boundaries (ABSR)
+c	If conditions are not specified, FREE (unconstrained) is assumed
+c
+c *********************************************************************************************************
+
+boun
+	side 1 free			/* Parsed from the interface on the importer
+	side 2 free
+	side 3 free
+	side 4 free
+	end
+
+c ********************************************************************************************************
+c
+c 							CALCULATED PROPERTIES
+c
+c ********************************************************************************************************
+c
+c	By default, Flex only calculates the minimum required data set, typically this means
+c	only velocities. This is done for memory efficiency.
+c	Should other properites be required (e.g. displacements, stresses, strains, pressure), 
+c	then these must be requested by the CALC command
+c	The manual lists all these options
+c
+c ********************************************************************************************************
+
+calc
+	disp								/* calculate displacements
+	pres								/* calculate pressure (average of stresses in solid)
+	max pres pmin pmax					/* calculate MAX and MIN pressure (average of stresses in solid)
+	end
+
+c *******************************************************************************************************
+c
+c 						Display the model
+c
+c *******************************************************************************************************
+
+grph
+	arrow pole
+	plot matr
+	end										/* return to command prompt
+
+c **********************************************************************************************************
+c 
+c	 							PRESSURE LOAD APPLICATION
+c 
+c **********************************************************************************************************
+c 
+c	Apply a load with either piezoelectric material or direct pressure application
+c
+c *********************************************************************************************************
+
+plod
+	pdef pld1 func							/* Name from interface
+plod
+	vctr vct1 0 0.001
+	sdf2 pld1 vct1 steel stst 1 $indgrd 1 $jndgrd  		/* Get names for nod2
+
+	end									/* on part of model specified
+
+c *********************************************************************************************************
+c
+c 							CHOOSE TIME HISTORIES TO STORE
+c
+c *********************************************************************************************************
+c
+c	Save field (such as displacement or pressure) from a node or element for all time steps with POUT command
+c	Histories are referenced by order of specification
+c	Histories will be saved in the Flex History file (flxhst)
+c
+c *******************************************************************************************************
+
+pout
+	hist func							/* Universal - always stored
+	if ( $ielec eq 1 ) then
+	histname electrode vq all			/* Stores electrode data if present
+	endif
+	end
+
+c *******************************************************************************************************
+c
+c 									PROCESS MODEL
+c
+c *******************************************************************************************************
+c
+c	Issue process (PRCS) command
+c
+c	Checks model integrity, and calculates stable time step
+c	NOTE: Process command must always be issued
+c
+c *******************************************************************************************************
+
+prcs                                                     /* run process step
+
+grph
+
+	plot matr
+	end
+term
+
+c *******************************************************************************************************
+c
+c						 			RUN THE MODEL
+c
+c *******************************************************************************************************
+c
+c	Specify number of time steps to be run
+c	Can be set to auto, by using ringdown	
+c
+c *******************************************************************************************************
+
+symb #get { step } timestep			/* store timestep size in variable 'step'
+symb simtime = 5e-06
+symb nexec = nint ( $simtime / $step )	/* calculate number of required timesteps
+symb nloops = 50
+symb nexec2 = nint ( $nexec / $nloops )
+
+proc plot save
+exec $nexec2						/* run for 'nexec' timesteps
+
+grph
+	nvew 1
+	plot pmax
+	end
+
+end$ proc
+
+proc plot $nloops
+
+term
+
+c *******************************************************************************************************
+c
+c 						Save symbol variables to file for later use
+c
+c *******************************************************************************************************
+
+symb #get { labl } jobname					/* find name of run
+symb #save symb.$labl						/* save in symb file
+stop										/* return to command prompt
