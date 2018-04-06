@@ -1,0 +1,716 @@
+c mem 100						/* allocate 100 megawords of memory, 400 MegaBytes 
+c							/* NOTE:- Not needed for Windows versions
+c							/* MEM command must be first command in file, if used
+c
+c *************************************************************************************************************
+c
+c								FLEX INPUT FILE TEMPLATE
+c
+c *************************************************************************************************************
+c
+c 'Bare Bones' Example File
+c Contains basic commands that are essential, and those almost always used
+c
+c DESIGNER		: Robbie Banks, Weidlinger Associates Inc.
+c MODEL DESCRIPTION	: Excitation and propagation of a wave from an angled shoe into a metal
+c				: block with a weld defect included. From a multi element transducer with
+c				: time shifting applied to the excitation signal. Note: no piezo material
+c DATE CREATED		: 3/11/05
+c VERSION			: 1.0
+c
+c *************************************************************************************************************
+c
+c	Essential commands are: GRID, GEOM, MATR, SITE, BOUN, PRCS, EXEC
+c	at least one of PLOD or PIEZ
+c	at least one of FUNC or DATA
+c
+c	Common commands are CALC, POUT
+c
+c	Note the use 'c' at the start of a line means that line will be read as a comment 
+c
+c	Set job identity names that will be 'tagged' with output files using TITL command.
+c	The first is an 8 character dentifier, then up to a 60 character description
+c
+c ************************************************************************************************************
+
+titl shoeweld Wave propagation and interaction with weld defect
+
+c ************************************************************************************************************
+c
+c									MODEL PARAMETERS
+c
+c ************************************************************************************************************
+c
+c 	Setup symbol variables for later use. Typical values include thickness etc
+c
+c	e.g.
+c 		symb pztthick = 2.e-3					/* PZT thickness 
+c 		symb pztradius = 20.e-3					/* PZT width 
+c
+c 	Note that units are arbitrary, but must be consistent throughout model
+c
+c ************************************************************************************************************
+c
+c						INSERT YOUR MODEL PARAMETER VARIABLES BELOW
+c
+c ************************************************************************************************************
+
+c Block under test
+c
+symb bloklen = 100.0e-3					/* Block length
+symb blokthk = 40.0e-3					/* Thickness of aluminium Block
+symb blokweld = 75.0e-3					/* Distance to the centre of the weld
+
+symb deflen = 5.0e-3					/* Length of the defect
+symb defthk = 1.0e-3					/* Thickness of defect
+symb defdeep = 18.0e-3					/* Depth of defect from bottom of block
+
+symb txdrthk = 2.0e-3					/* thickness of ceramic transducer
+symb txdrwd = 8.0e-3					/* Width of transducer
+
+symb elemwdt = 1.3e-3					/* Width of the transducer elements
+symb elemkerf = 0.1e-3					/* Seperation between elements
+symb nelem = 16						/* Number of elements
+
+symb shoethk = 25.0e-3					/* Thickness of shoe at longest point (i.e. right hand side)
+symb shoewdt = 30.0e-3					/* Width of the shoe
+symb shoeoff = 2.0e-3					/* Offset from block to start of slope
+
+symb shoeang = 35.						/* Degree of shoe tilt, w.r.t. Y plane
+ 
+symb weldang = 30.						/* Weld angle (both sides)
+
+symb weldang1 = 90 - $weldang
+symb weldang2 = 90 + $weldang
+
+symb radc = 3.14159 / 180				/* Radian conversion
+symb aradc = 180 / 3.14159				/* Radian conversion
+
+c Calcuations for shoe dimensions 
+
+symb shoeangm = $shoeang * $radc 
+symb shoeopp = $shoewdt * sin ( $shoeangm )	/* Determine the height of the block by finding the
+									/* height of the slope on the shoe and adding 2mm
+symb shoehgt = $shoeopp + $shoeoff
+
+symb absrwid = $shoehgt * tan ( $shoeangm )	/* Width of the absorbing material on end
+symb shoelen = $shoewdt * cos ( $shoeangm )	/* Width of the active area of shoe
+
+symb shoetot = $absrwid + $shoelen			/* Total shoe width
+
+symb shoe_end = 50.0e-3
+symb shoestrt = $shoe_end - $shoetot		/* Start point for shoe
+
+symb elemstrt = ( $shoewdt - ( $nelem * $elemwdt ) - ( ( $nelem - 1 ) * $elemkerf ) ) / 2
+
+
+c ***********************************************************************************************************
+c
+c								X-Y-Z CO-ORDINATE SYSTEM
+c
+c ***********************************************************************************************************
+c
+c 	Define x, y (and z for 3D) co-ordinates as symbol variables
+c 	Creating these as a function of previously defined variables, and relative to
+c 	previous x, y position allows for simple altering of model.
+c 
+c	For 3D, also specify z-coordinates
+c
+c ************************************************************************************************************
+c
+c								INSERT YOUR XYZ VARIABLES BELOW
+c
+c ************************************************************************************************************
+
+c X-Direction
+
+symb x1 = 0.0						/* Start of model
+symb x2 = $x1 + $shoestrt			/* End of the transmitting shoe
+symb x3 = $x1 + $shoe_end			/* End of the shoe
+symb x4 = $x1 + $blokweld			/* Middle of the weld
+symb x5 = $x1 + $bloklen				/* End of the block
+
+
+c Y-Direction
+
+symb y1 = 0.0						/* Base of plate
+symb y2 = $y1 + $defdeep				/* Bottom of weld defect
+symb y3 = $y1 + $blokthk				/* Top of metal block
+symb y4 = $y3 + $shoeoff				/* Start of slope on block
+symb y5 = $y3 + $shoehgt				/* Total height of shoe
+
+c ************************************************************************************************************
+c
+c									DEFINE MESHING 
+c
+c ************************************************************************************************************ 
+c
+c	Set variable for approximate element size for model
+c	Must be sufficient to represent wavelengths of interest
+c	Recommended that at least 15 elements per wavelength are used
+c
+c	May be specified explicitly, e.g.   symb box = 1.e-6
+c	or calculated based upon frequency of interest, and material velocities, e.g.
+c
+c	Note this is only setting a variable for later use in IJK index calculation
+c
+c ************************************************************************************************************
+c
+c							INSERT YOUR APPROXIMATE ELEMENT SIZE BELOW
+c
+c ************************************************************************************************************
+
+symb wavevel = 2400.						/* Longitudinal Wave velocity in Material (m/s)
+symb freqint = 3500e3						/* Frequency of Interest (Hz)
+symb freqdamp = $freqint    
+symb wavelgth = $wavevel / $freqint			/* Wavelength of Sound in Material (m)
+
+
+symb xnumelem = 30							/* X Plane
+symb xbox = $wavelgth / $xnumelem
+
+symb ynumelem = 30							/* Y Plane
+symb ybox = $wavelgth / $ynumelem
+
+symb ybox2 = $ybox
+
+c ************************************************************************************************************
+c
+c									I-J-K CO-ORDINATE SYSTEM
+c
+c ************************************************************************************************************
+c
+c	Calculate I, J, and K (for 3D) indices
+c	As for x, y, z positions, set relative to previous index to allow simple alterations
+c
+c 	e.g.
+c		symb i1 = 1								/* index for centre of PZT
+c 		symb i2 = $i1 + nint ( ( $x2 - $x1 ) / $box )	/* set i-index for edge of PZT
+c												/* based on x positions and 
+c												/* approximate element size
+c 		symb indgrd = $i2							/* maximum i-index
+c	etc...
+c
+c	For 3D, also specify k-indices
+c
+c ************************************************************************************************************
+c
+c								INSERT YOUR IJK VARIABLES BELOW
+c
+c ************************************************************************************************************
+
+
+symb i1 = 1									/* Set the first node in the 'i' direction as 1
+symb i2 = $i1 + nint ( ( $x2 - $x1 ) / $xbox )
+symb i3 = $i2 + nint ( ( $x3 - $x2 ) / $xbox )
+symb i4 = $i3 + nint ( ( $x4 - $x3 ) / $xbox )
+symb i5 = $i4 + nint ( ( $x5 - $x4 ) / $xbox )
+
+symb indgrd = $i5								/* create variable for last node in i			
+
+symb j1 = 1									/* Set the first node in the 'j' direction as 1
+symb j2 = $j1 + nint ( ( $y2 - $y1 ) / $ybox )
+symb j3 = $j2 + nint ( ( $y3 - $y2 ) / $ybox )
+symb j4 = $j3 + nint ( ( $y4 - $y3 ) / $ybox2 )
+symb j5 = $j4 + nint ( ( $y5 - $y4 ) / $ybox2 )
+
+symb jndgrd = $j5								/* create variable for last node in j		
+
+
+c ************************************************************************************************************
+c
+c									GRID DEFINITION
+c
+c ************************************************************************************************************
+c
+c	Set size and type of finite element grid
+c	Specified as number of nodes in each direction
+c	There are always one less elements in each direction than nodes
+c
+c	Can be explicitly stated as a number, or as a previously calculated variable.
+c
+c	Options are any one (and only one) of:
+c
+c 		grid $indgrd $jndgrd						/* 2D (plane strain) -       
+c 		grid $indgrd $jndgrd axix					/* 2D (axisymmetric)      (or axiy) 
+c 		grid $indgrd $jndgrd $kndgrd					/* 3D                            
+c
+c ***********************************************************************************************************
+c
+c							INSERT YOUR GRID COMMANDS BELOW
+c
+c ***********************************************************************************************************
+
+grid $indgrd $jndgrd			/* 2D Model
+
+
+c ************************************************************************************************************
+c
+c									GEOM DEFINITION
+c
+c ************************************************************************************************************
+c
+c	Asscoiate ijk grid with xyz co-ordinates
+c	Specify each axis and the regions within (xcrd and ycrd for 2D, also zcrd for 3d)
+c     Entire grid must be specified
+c	Skewed partitions and external build files read in here
+c
+c e.g.
+c
+c     geom
+c           xcrd $x1 $x2 $i1 $i2
+c           xcrd $x2 $x3 $i2 $i3
+c
+c           ycrd $y1 $y2 $j1 $j2
+c
+c           zcrd $z1 $z2 $k1 $k2           /* only needed for 3D
+c
+c ***********************************************************************************************************
+c
+c							INSERT YOUR GEOM COMMANDS BELOW
+c
+c ***********************************************************************************************************
+
+geom
+	xcrd $x1 $x2 $i1 $i2
+	xcrd $x2 $x3 $i2 $i3
+	xcrd $x3 $x4 $i3 $i4
+	xcrd $x4 $x5 $i4 $i5
+
+	ycrd $y1 $y2 $j1 $j2
+	ycrd $y2 $y3 $j2 $j3
+	ycrd $y3 $y4 $j3 $j4
+	ycrd $y4 $y5 $j4 $j5
+	end
+
+
+c **********************************************************************************************************
+c
+c 									MATERIAL PROPERTIES
+c
+c **********************************************************************************************************
+c
+c	While Material names and Properties can be specified within the Flex input file
+c	it is usually good practice to maintain a separate 'materials file' that is then
+c	read into the Flex input file. This is the method used here. The materials file
+c	'basictemplate.matr' details the method for specifiying material properties.
+c
+c	e.g.
+c 		symb #read basictemplate.matr                /* read in material properties 
+c
+c	Materials used must have been specified already with the MATR command
+c	or read in from a materials file.
+c
+c	Only VOID exists by default, which has no density, stiffness or velocity
+c	and is used to represent vacuum. It does not by default have dielectric
+c	properties specified.
+c
+c	Materials can be placed by nodal (ijk) ranges (areas or volumes) with REGN
+c	or by co-ordinates (xyz) with BLOK
+c
+c	Specified ranges can be a small as a single element or as large as the whole model
+c	If no indices are specified, then the entire model is set to that material
+c
+c	Any element may have a particular material set an unlimited number of times
+c	but only the last material specification will be applied.
+c
+c **********************************************************************************************************
+c
+c							READ IN OR DEFINE YOUR MATERIALS BELOW
+c
+c **********************************************************************************************************
+
+matr
+     wvsp on
+     type elas
+c
+c    define properties for base, matching and lens type materials
+c
+     prop stel 7900. 5900.  3100.			/* steel
+     prop stel2 7900. 5900.  3100.			/* steel
+     prop stel3 7900. 5900.  3100.			/* steel
+     prop rxlt 1060. 2340. 1100.			/* Rexolite   
+     prop rtvabsr 1294. 1022. 125.			/* RTV Rubber with higher damping 
+     prop m1 0.  0.  0. 					/* add fake materials to help apply plod's
+     prop m2 0.  0.  0. 			
+     prop m3 0.  0.  0. 		
+     prop m4 0.  0.  0. 		
+     prop m5 0.  0.  0. 			
+     prop m6 0.  0.  0. 			
+     prop m7 0.  0.  0. 			
+     prop m8 0.  0.  0. 			
+     prop m9 0.  0.  0. 	
+     prop m10 0.  0.  0. 
+     prop m11 0.  0.  0. 		
+     prop m12 0.  0.  0. 			
+     prop m13 0.  0.  0. 		
+     prop m14 0.  0.  0. 		
+     prop m15 0.  0.  0. 			
+     prop m16 0.  0.  0. 		
+c
+     vdmp stel 1e6 db 0.2 0.5  1000000. 1. 0.01
+     vdmp stel2 1e6 db 0.2 0.5  1000000. 1. 0.01
+     vdmp stel3 1e6 db 0.2 0.5  1000000. 1. 0.01
+     vdmp rxlt 1e6 db 11.0  33.  30.e6 1. 0.01
+     vdmp rtvabsr 1e6 db 1408. 2737. 1.e6  1.  1.  /* Usually 408 and 1737
+c
+     end
+
+symb shoeang2 = $shoeang + 90.
+
+axis
+	form angl
+	defn axshoe cart $x2 $y4 * 0. 0. $shoeang	/* Define angle for transmitting txdr
+	end
+
+site
+	regn void								/* Set all elements to void
+	regn stel $i1 $i5 $j1 $j3				/* Generate Steel plate
+
+c Now we will insert two identical steel sections, but with different names so we can identify between
+c the two and select the location for in the insertion of the defect
+
+	cyln stel2 stnd z -0.1 0.1 $x4 $y1 1. 1. 0. 0. $weldang1 $weldang2 $i1 $i5 $j2 $j3 	/* Top section of defect
+	cyln stel3 stnd z -0.1 0.1 $x4 $y1 1. 1. 0. 0. $weldang1 $weldang2 $i1 $i5 $j1 $j2 	/* Lower section of defect
+
+
+c ADD ON THE REXOLITE SHOE
+
+	regn rxlt $i2 $i3 $j3 $j5							/* Add the Rexolite
+	blok void cent axshoe $x1 $shoewdt $y1 $shoethk			/* Remove the sloped section
+	cyln rtvabsr stnd z -1. 1. $x3 $y3 1. 1. 0. 0. 89. $shoeang2 $i2 $i3 $j3 $j5 /* Add the absrobing material
+
+c ADD THE FAKE MATERIALS TO ACT AS THE ELEMENT ELECTRODES
+
+	symb xinc1 = $elemstrt
+	symb xinc2 = $elemstrt + $elemwdt						/* Size of first element
+	do loope I 1 $nelem
+	 blok m$I cent axshoe $xinc1 $xinc2 $y1 0.2e-3			/* Add on a fake blok for transducer element
+	 symb xinc1 = $xinc2 + $elemkerf						/* Shift the start and finish x points
+	 symb xinc2 = $xinc1 + $elemwdt	
+	end$ loope
+	end
+
+symb #get { xdef xend ydef } matbound xyz stel3	/* returns the location of the start of the defect
+
+
+c DEFECT INSERTION 
+
+axis
+	form angl
+	defn axdef cart $xdef $y2 * 0. 0. $weldang		/* Define angle for defect
+	end
+
+site
+	blok void cent axdef $x1 $defthk $y1 $deflen		/* Generate void defect in the material
+	end
+
+symb #get { xmin xmax } matbound xyz stel2			/* Get the xmin and xmax of the weld wedge
+symb #get { xabsr } matbound xyz rtvabsr			/* Get the xmin and xmax of the weld wedge
+
+grph
+	draw cord $x4 $y1 * $xmin $y3
+	draw cord $x4 $y1 * $xmax $y3
+	draw cord $x1 $y3 * $x5 $y3
+	draw cord $x3 $y3 * $x3 $y5
+	draw cord $x2 $y3 * $x2 $y4
+	draw cord $x2 $y4 * $xabsr $y5
+	draw cord $xabsr $y5 * $x3 $y3
+	comb matr stel stel2 stel3
+	line off
+	plot matr
+	end
+t
+
+c **********************************************************************************************************
+c
+c 									BOUNDARY CONDITIONS 
+c
+c **********************************************************************************************************
+c	How the model interacts with the 'rest of the world'
+c
+c	Commonly used for symmetry (SYMM) and infinite absorbing boundaries (ABSR)
+c
+c	If conditions are not specified, FREE (unconstrained) is assumed
+c
+c	Can be specified as nodel indicies but more conveniently by model side, e.g.
+c
+c	SIDE 1/xmin/imin - X-MINIMUM
+c	SIDE 2/xmax/imax - X-MAXIMUM
+c	SIDE 3/ymin/jmin - Y-MINIMUM
+c	SIDE 4/ymax/ymax - Y-MAXIMUM
+c	SIDE 5/zmin/kmin - Z-MINIMUM (3D only)
+c	SIDE 6/zmax/kmax - Z-MAXIMUM (3D only)
+c
+c *********************************************************************************************************
+c
+c							INSERT YOUR BOUNDARY CONDITIONS BELOW
+c 
+c *********************************************************************************************************
+
+c NONE
+
+
+
+c ********************************************************************************************************
+c 
+c 									DRIVING FUNCTION
+c
+c ********************************************************************************************************
+c 	A number of predefined waveform functions can be accessed in PZFlex.
+c 	The SINE wave option is used below, other examples include wavelets, gaussians,
+c 	and step functions. The manual details the function entries
+c
+c 	e.g.
+c		func sine $freqint 1. 0. 1.				/* apply single cycle sinusoid
+c											/* at frequency of variable 'freqint'
+c 								-OR-
+c
+c 	Data may also be read in from an external file with the DATA HIST command, e.g.
+c 	from an oscilloscope measurement, and set as the function
+c
+c	e.g.
+c 		data hist drv1 * function.dat				/* Read contents of file 'function.dat'
+c											/* into array 'drv1'
+c											/* File should be in 2 column ASCII format
+c 											/* as Time  Amplitude
+c 		func hist drv1							/* Set FUNC equal to DRV1
+c
+c ********************************************************************************************************
+c
+c							SELECT DRIVING FUNCTION AND INSERT BELOW
+c
+c ********************************************************************************************************
+
+func sine $freqint 1. 0. 1.				/* apply single cycle sinusoid
+									/* at frequency of variable 'freqint'
+
+
+c ********************************************************************************************************
+c 
+c 									CALCULATED PROPERTIES
+c
+c ********************************************************************************************************
+c	By default, Flex only calculates the minimum required data set, typically this means
+c	only velocities. This is done for memory efficiency.
+c	Should other properites be required (e.g. displacements, stresses, strains, pressure), 
+c	then these must be requested by the CALC command
+c	The manual lists all these options
+c
+c 	e.g.
+c 		calc
+c			disp						/* calculate displacements
+c			pres						/* calculate pressure (average of stresses in solid)
+c			end
+c
+c ********************************************************************************************************
+c
+c							CHOOSE PROPERTIES TO CALCULATE AND INSERT BELOW
+c
+c ********************************************************************************************************
+
+calc
+	disp						/* calculate displacements
+	pres						/* calculate pressure (average of stresses in solid)
+	max zcrl pmin pmax
+	sj2p						/* Shear stress
+	curl						/* Curl of the displacement field
+	end
+
+c **********************************************************************************************************
+c 
+c	 							PRESSURE LOAD APPLICATION
+c 
+c **********************************************************************************************************
+c 
+c	Apply a load with either piezoelectric material or direct pressure application
+c
+c	e.g.
+c 		plod
+c			pdef pld1 func								/* choose driving function and name 'pld1'
+c			vctr vct1 1.  0.  0.						/* choose direction for pressure to be applied
+c			sdef pld1 vct1 $indgrd $indgrd  $j1 $jndgrd		/* Apply function 'pld1' in direction 'vct1'
+c													/* across top of model
+c			end
+c
+c *********************************************************************************************************
+c
+c						IF PRESSURE LOAD TO BE APPLIED, INSERT COMMANDS BELOW
+c
+c *********************************************************************************************************
+
+
+plod
+c	symb tshft = 0.0						/* Set initial time shift as zero
+c	do loopp1 I 1 $nelem					/* set up do loop to apply time shift
+c	 pdef pld$I func 1. $tshft				/* Use func as the driving function for 'pld1' and apply
+c	 symb tshft = $tshft + 1.0e-7				/* recursive time shift
+c	end$ loopp1
+	pdef pld1 func 1.  						/* Use func as the driving function for 'pld1' and apply
+	pdef pld2 func 1. 72e-9					/* Use func as the driving function for 'pld1' and apply
+	pdef pld3 func 1. 140e-9 				/* Use func as the driving function for 'pld1' and apply
+	pdef pld4 func 1. 203e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld5 func 1. 262e-9 				/* Use func as the driving function for 'pld1' and apply
+	pdef pld6 func 1. 315e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld7 func 1. 362e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld8 func 1. 402e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld9 func 1. 436e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld10 func 1. 463e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld11 func 1. 482e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld12 func 1. 493e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld13 func 1. 496e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld14 func 1. 489e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld15 func 1. 473e-9  				/* Use func as the driving function for 'pld1' and apply
+	pdef pld16 func 1. 447e-9  				/* Use func as the driving function for 'pld1' and apply
+	vctr vct1 -1. -2.1445 0.					/* Set vector to be -35 degrees 
+
+
+	do loopp2 I 1 $nelem					/* Use a do loop to apply pressure to all elements
+	 sdf2 pld$I vct1 rxlt m$I $i2 $i3 $j4 $j5	/* apply the pressure load to the given element interface
+	end$ loopp2
+
+c *********************************************************************************************************
+c
+c 							CHOOSE TIME HISTORIES TO STORE
+c
+c *********************************************************************************************************
+c	Save field (such as displacement or pressure) from a node or element for all time
+c	steps with POUT command
+c
+c	Histories are referenced by order of specification
+c
+c	Histories will be saved in the Flex History file (flxhst)
+c
+c 	e.g.
+c
+c 	pout
+c		hist func								/* save input function as time history
+c											/* History 1
+c		histname electrode vq all				/* save voltage and charge on all electrodes
+c											/* saved in order of definition
+c 											/* e.g. for 2 electrodes:
+c											/* Histories 2, 3, 4 and 5 - V1, Q1, V2, Q2
+c		hist xdsp $indgrd $indgrd 1 $j1 $j1 1		/* x-direction displacement on top 
+c											/* and centre of PZT
+c 											/* History 6
+c
+c *******************************************************************************************************
+c
+c						CHOOSE TIME HISTORIES TO STORE AND INSERT BELOW
+c
+c *******************************************************************************************************
+
+pout
+	hist func								/* save input function as time history
+	end
+
+c *******************************************************************************************************
+c
+c 									PROCESS MODEL
+c
+c *******************************************************************************************************
+c
+c	Issue process (PRCS) command
+c
+c	Checks model integrity, and calculates stable time step
+c	NOTE: Process command must always be issued
+c
+c *******************************************************************************************************
+
+wndo $i2 $i3 $j4 $j5
+
+time * * 0.95
+
+prcs									/* run process step
+
+grph
+	line off
+	plot matr
+	end
+t
+
+c *******************************************************************************************************
+c
+c						 			RUN THE MODEL
+c
+c *******************************************************************************************************
+c
+c	Specify number of time steps to be run
+c
+c	Size of time step can be found with a 'symb #get' command
+c	From this the number of timesteps required to reach a given time can be found
+c
+c	e.g.
+c 		symb #get { step } timestep				/* store timestep size in variable 'step'
+c 		symb simtime = 1.e-6					/* variable set to 1 microsecond
+c 		symb nexec = nint ( $simtime / $step )		/* calculate number of required timesteps
+c
+c 		exec $nexec							/* run for 'nexec' timesteps
+c
+c *******************************************************************************************************
+c
+c							INSERT EXEC COMMAND TO RUN MODEL BELOW
+c
+c *******************************************************************************************************
+
+
+symb #get { step } timestep
+symb simtime = 30.0e-6					/* Total simulation time
+
+symb nsteps = nint ( $simtime / $step )
+symb nloops = 200						/* number of loops for this part of movie
+symb nsteps2 = nint ( $nsteps / $nloops )
+
+grph
+	set imag avi
+	blok b1 indx $i1 $indgrd $j1 $j3
+	end
+c 							Create plotting procedure
+c
+proc plot save
+grph
+	nvew 1
+	colr tabl data 6
+	pset sttl 1 'Pressure transit through model'
+c	plot sj2p blok b1 rang -1.0e-1 1.0e-1
+c	plot sj2p rang -1.0e-1 1.0e-1
+	plot zcrl blok b1 rang -2.0e-12 2.0e-12
+	imag
+	end
+end$ proc
+
+do loop I 1 $nloops
+proc plot
+exec $nsteps2
+end$ loop
+
+symb #msg 1
+End of Simulation
+
+data
+	file out flxdato.ndt
+	out pmax
+	out pmin
+	end
+
+data
+	file out plog.ndt
+	log pmax lpmx 
+	log pmin lpmn
+	out lpmx
+	out lpmn
+	end
+
+
+c *******************************************************************************************************
+c
+c						Save symbol variables to file for later use
+c
+c *******************************************************************************************************
+
+symb #get { labl } jobname					/* find name of run
+symb #save symb.$labl						/* save in symb file
+
+stop										/* return to command prompt
+
+

@@ -1,0 +1,352 @@
+c *************************************************************************************************************
+c
+c								pMUT MODEL 2D AXISYMMETRIC LOAD
+c
+c *************************************************************************************************************
+c
+c DESIGNER		:  		PZFlex
+c MODEL DESCRIPTION	:	pMUT 2D Axisymmetric Model with Load
+c DATE CREATED		:	15/09/15
+c VERSION		:		1.0
+c
+c *************************************************************************************************************
+
+c Use all cores
+mp omp * *
+
+c Title adds a title and description to every ouput file
+titl pMUT_axiy_load  	pMUT 2D Axisymmetric Model with Load
+
+c No restart file
+rest no
+
+
+
+c ************************************************************************************************************
+c
+c									INPUTS
+c
+c ************************************************************************************************************
+
+c Dimensions
+symb topelec_thk 	= 0.2e-6 					/* thickness of top electrode
+symbx piezo_thk 	= 1.e-6 						/* thickness of piezo material
+symb botelec_thk	= 0.2e-6 					/* thickness of bottom electrode
+symb subs_thk 		= 3.e-6						/* thickness of substrate
+symb subs_rad 		= 22.5e-6						/* radius of substrate
+symb cavity_height 	= 3.e-6   				/* cavity height 
+symb water 			= 40.e-6 						/* water on the top
+symb side_water 	= 10.e-6					/* water at side
+
+c Electrical loading
+symb rdamp = 50.					/* resistive damping in ohms
+
+c Frequency and meshing
+symb freqint = 30.e6					/* frequency of interest
+symb memboxes = 3					/* boxes across membrane
+symb aratio = 1				/* aspect ratio of elements
+symb nloops = 20					/* number of frames in animation
+symb ncycles = 35					/* simulation time in number of cycles
+symb tfact = 0.80					/* time stability factor
+
+c Calculations
+symb boxmemy = $piezo_thk / $memboxes /*$memboxes			/* nominal box size through piezo
+symb boxx = $boxmemy * $aratio					/* nominal lateral box size across piezp
+symb boxy = $boxx * $aratio						/* box size in y for rest of model
+symb freqdamp = $freqint						/* damping frequency
+symb simtime = $ncycles / $freqint
+
+
+
+c ***********************************************************************************************************
+c
+c								X-Y-Z CO-ORDINATE SYSTEM
+c
+c ***********************************************************************************************************
+
+c Define keypoints in x
+symb #keycord x 1 0. $subs_rad $side_water 				/* use keycord function	to create x					
+symb #get { idx } rootmax x												/* maximum x index
+
+c Define keypoints in y
+symb #keycord y 1 0. $subs_thk $cavity_height $botelec_thk $piezo_thk $topelec_thk $water
+symb #get { jdx } rootmax y												/* maximum y index
+
+
+
+c ************************************************************************************************************
+c
+c									I-J-K CO-ORDINATE SYSTEM
+c
+c ************************************************************************************************************
+
+c Define i keypoints
+symb #keyindx i 1 $idx 1 $boxx						/* create i indices using keyindx
+symb indgrd = $i$idx								/* total number of nodes in i
+
+c Define j keypoints
+symb #keyindx j 1 2 1 $boxy $memboxes			/* create j indices using keyindx
+symb #keyindx j 2 3 $j2 $boxy $memboxes
+symb #keyindx j 3 4 $j3 $boxy 1 /*$memboxes
+symb #keyindx j 4 5 $j4 $boxy 1
+symb #keyindx j 5 6 $j5 $boxy 1
+symb #keyindx j 6 7 $j6 $boxy $memboxes
+symb jndgrd = $j$jdx								/* total number of nodes in j
+
+c List all variables in print file
+symb #list
+
+
+
+c ************************************************************************************************************
+c
+c									GRID & GEOMETRY DEFINITION
+c
+c ************************************************************************************************************
+
+c Create grid
+grid $indgrd $jndgrd axiy			/* set up and axisymmetric grid
+
+c Define geometry
+geom keypnt $idx $jdx				/* keypnt command replaces xcrd and ycrd commands
+
+
+
+c **********************************************************************************************************
+c
+c 									MATERIAL PROPERTIES & PLACEMENT
+c
+c **********************************************************************************************************
+
+c Read in material file
+symb #read pMUT.prjmat
+
+c Assign materials to grid
+site
+	regn void
+	regn si $i1 $i3 $j1 $j6				/* place si on the base of model
+	regn void $i1 $i2 $j2 $j3			/* cavity
+	regn moly $i1 $i2 $j3 $j4			/* place bottom electrode
+	regn aln $i1 $i2 $j4 $j5			/* place piezo material
+	regn moly $i1 $i2 $j5 $j6			/* place top electrode
+	regn watr $i1 $i3 $j6 $j7
+	end
+
+c Plot model
+grph
+	mirr x on									/* mirror plot around x
+	nvew 2 1									/* create two plots
+	line off									/* do not plot node lines
+	plot matr									/* plot model
+	line on										/* plot node lines
+	mirr x off
+	plot matr i $i2-40 $i2+40 j $j1 $j6	/* plot model, only around the membrane
+	end
+
+term
+
+
+
+c **********************************************************************************************************
+c
+c 									INPUTS & BOUNDARY CONDITIONS 
+c
+c **********************************************************************************************************
+
+c Define boundary conditions
+boun
+	side xmin symm			/* apply symmetry since axisymmetric model
+	
+	defn xmaxbot fixd		
+	node $i3 $i3 $j1 $j6	/* fix rim
+	
+	defn xmaxtop absr		/* make water edge absorbing
+	node $i3 $i3 $j6 $j7
+	
+	side ymin fixd			/* free boundary at bottom
+	side ymax absr			/* absorber at top
+	end
+
+c Define wavelet drive function
+func wvlt $freqint 1. * * 2.25
+
+c Define a damping circuit
+circ
+	defn cdamp						/* define circuit with name 'cdamp'
+	elem rest sers $rdamp			/* add series resistor
+	end
+	
+c Define electrical setup
+piez
+
+	/* Define electrical window - where electrical solve takes place
+	wndo $i1 $i2 $j4 $j5
+	
+	/* Create top electrode
+	defn top							/* create electrode called 'top'
+	node $i1 $i2 $j5 $j5				/* place on top of PZT
+	conn top cdamp volt func			/* apply 'func' to electrode 'top' as a voltage
+	
+	/* Create bottom electrode
+	defn bot
+	node $i1 $i2 $j4 $j4
+	bc bot grnd	 						/* apply electrical ground to electrode 'bot'
+
+	end
+
+
+c ********************************************************************************************************
+c 
+c 									CALCULATED PROPERTIES
+c
+c ********************************************************************************************************
+
+c Parameters to be calculated
+calc
+	disp							/* calculate displacements, xdsp, ydsp
+	pres acoustic					/* calculate pressure, including acoustic pressure, pres (civil engineering), aprs (acoustic pressure)
+	max ydsp * dmax					/* store max y displacement at all points in new array dmax
+	end
+
+c Store mode shape information
+shap
+	freq 6.e6						/* frequencies to calculate mode shapes
+	freq 27.e6
+	twnd $simtime hann righ 1.		/* apply window funciton to smooth ringdown
+	data ydsp						/* store y displacement data
+	end
+
+c Choose time histories to store
+pout
+	hist func						/* Record #1 store drive function
+	histname electrode vq all		/* Record #2 - 5 store voltage and charge on both electrodes
+	hist ydsp $i1 $i1 1 $j6 $j6 1	/* Record #6 y displacement on surface of membrane
+	end
+
+c Save data for extrapolation
+extr	
+	defn kirk					/* use Kirchhoff algorithm
+	ref in 0. 0. 0.				/* specify reference point 'inside' model
+	node $i1 $i3 $j6+5 $j6+5	/* specify nodes on which to store data
+	end
+
+
+c *******************************************************************************************************
+c
+c 									PROCESS MODEL
+c
+c *******************************************************************************************************
+
+c Timestep commands
+time * * $tfact
+zone auto
+
+c Process model
+prcs                                    /* run process step
+
+c Plot model
+grph
+	mirr x on									/* mirror plot around x
+	nvew 2 1									/* create two plots
+	line off									/* do not plot node lines
+	plot matr									/* plot model
+	line on										/* plot node lines
+	mirr x off
+	arrow pole 5 5 								/* show poling arrows
+	plot matr j $j1 $j6 &						/* plot device and electrode
+		 piez j $j1 $j6		
+	end
+
+term
+
+
+
+c *******************************************************************************************************
+c
+c						 			RUN THE MODEL
+c
+c *******************************************************************************************************
+
+c Calculations for execution
+symb #get { step } timestep					/* store timestep to variable 'step'
+symb nexec = $simtime / $step				/* total number of timesteps required
+symb nexec2 = $nexec / $nloops				/* timesteps in each loop
+symb bbox_top = $y6 * 2.
+
+c Set up graphics for plot
+grph
+	line off								/* turn plot lines off
+	arrow off								/* turn poling arrows off
+	set imag avi							/* store images to .avi file
+	mirr x on
+	nvew 4 1								/* create 3 views (type 3) 
+	end
+
+c Create run/plot procedure
+symb n = 1					/* variable to report job progress
+proc plot save
+
+c Calculate some timesteps
+exec $nexec2
+
+c Plot the model
+grph
+	disp 1.
+    plot aprs j $j6 $j7 rang -500. 500.
+	disp 50.e3								/* show exagerated displacement
+	bbox user -$x$idx $x$idx $y1 $bbox_top			/* place bounding box around device
+	plot ydsp j $j1 $j6
+	pset wndo * * -0.6e-10 0.6e-10 
+	plot 6
+	pset wndo * * -1.5e-13 1.5e-13
+	plot 3
+	imag				/* saves plot to avi file
+	end
+
+c Report progress to user
+symb percent = 100. * $n / $nloops
+symb #msg 1
+Job is $percent % complete
+
+c Increment n
+symb n = $n + 1
+ 
+end$ proc
+
+
+c Get start time
+symb #get { tbeg } wtime
+
+c Run model
+proc plot $nloops
+
+/* Calculate runtime and display to user
+symb #get { tend } wtime
+symb trun = $tend - $tbeg
+symb #msg 2
+Total runtime $trun s
+
+term
+
+
+
+c *******************************************************************************************************
+c
+c						Save symbol variables to file for later use
+c
+c *******************************************************************************************************
+
+c Output shape and pmax data to data output file
+data
+	out modl			/* output model geometry
+	out shap/all		/* output mode shape information
+	out dmax			/* output dmax array
+	end
+
+
+symb #get { labl } jobname					/* find name of run
+symb #save '$labl.symb'						/* save in symb file
+
+stop								/* return to command prompt
+
+

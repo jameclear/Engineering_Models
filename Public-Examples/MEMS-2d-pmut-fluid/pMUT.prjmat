@@ -1,0 +1,206 @@
+c -------------------------------------------------------------- 
+c                   Project Material List
+c -------------------------------------------------------------- 
+
+
+c -------------------------------------------------------------------------
+c Global variables used in all the material definitions
+c -------------------------------------------------------------------------
+c
+symb epvacm = 8.854e-12               /* dielectric constant for vacumn
+symb freqdamp = 1.e6 if noexist       /* specified frequency for damping model
+symb rmu0 = 1.2566e-6
+
+symb #msg 5
+********************************************************
+Damping matched at $freqdamp Hz
+Redefine variable 'freqdamp' if device centre frequency
+varies significantly from this value
+********************************************************
+
+
+c
+c -------------------------------------------------------------------------
+c    Now define the axis transformation - only posx used in this file
+c -------------------------------------------------------------------------
+
+axis
+     form vctr
+     defn posx car2 0. 0. 0.    1.  0.  0.   0. 1. 0.
+     defn negx car2 0. 0. 0.   -1.  0.  0.   0. 1. 0.
+     defn posy car2 0. 0. 0.    0.  1.  0.   0. 0. 1.
+     defn negy car2 0. 0. 0.    0. -1.  0.   0. 0. 1.
+     defn posz car2 0. 0. 0.    0.  0.  1.   1. 0. 0.
+     defn negz car2 0. 0. 0.    0.  0. -1.   1. 0. 0.
+     end
+
+c -------------------------------------------------------------------------
+c    Input material properties to program
+c -------------------------------------------------------------------------
+
+matr
+c -------------------------------------------------------------- 
+c type : SOLID : 
+c name : si : 
+c desc : Silicon, generic 
+c -------------------------------------------------------------- 
+
+
+   wvsp on 
+   type elas 
+   prop si 2330. 8784.14 4855.62
+   vdmp si $freqdamp db 0.1 0.3 1e+06 1 0.01 1
+   
+
+
+c -------------------------------------------------------------- 
+c type : FLUID : 
+c name : watr : 
+c desc : Water at 25C : 
+c -------------------------------------------------------------- 
+
+
+   wvsp on 
+   type elas 
+   prop watr 1000 1496 0 0
+   vdmp watr $freqdamp db 0.002 0 1e+06 2 0.01 0
+   
+   
+   
+c -------------------------------------------------------------- 
+c type : PIEZO : 
+c name : aln : 
+c desc : AlN Parameters 
+c -------------------------------------------------------------- 
+
+
+c    define baseline dielectric coefficients
+
+symb epxx = 8.0                   /* dielectric constant (constant strain)
+symb epyy = $epxx                   /* dielectric constant (constant strain)
+symb epzz = 9.5                   /* dielectric constant (constant strain)
+symb rho  = 3230                    /* density
+symb qdmp = 90                      /* Mechanical Q at 1e6
+symb qsdmp = 90                      /* Mechanical Q at 1e6
+symb freqdamp = 1.e6 if noexist
+symb freqloss = 1e+06 if noexist                     /* Frequency that loss was measured at
+
+c    define baseline stiffness coefficients
+
+symb c11 = 3.45e+11                  /* stiffness constant (constant electric field)
+symb c12 = 1.25e+11                  /* stiffness constant
+symb c13 = 1.20e+11                  /* stiffness constant
+symb c14 = 0                  /* stiffness constant
+symb c15 = 0                  /* stiffness constant
+symb c16 = 0                  /* stiffness constant
+symb c22 = $c11                  /* stiffness constant (constant electric field)
+symb c23 = $c13                  /* stiffness constant
+symb c24 = 0                  /* stiffness constant
+symb c25 = 0                  /* stiffness constant
+symb c26 = 0                  /* stiffness constant
+symb c33 = 3.95e+11                  /* stiffness constant
+symb c34 = 0                  /* stiffness constant
+symb c35 = 0                  /* stiffness constant
+symb c36 = 0                  /* stiffness constant
+symb c44 = 1.18e+11                  /* stiffness constant
+symb c45 = 0                  /* stiffness constant
+symb c46 = 0                  /* stiffness constant
+symb c55 = $c44                  /* stiffness constant
+symb c56 = 0                  /* stiffness constant
+symb c66 = 1.10e+11
+
+c    define baseline piezoelectric coupling coefficients
+
+symb ex1 = 0                   /* coupling constant
+symb ex2 = 0                   /* coupling constant
+symb ex3 = 0                   /* coupling constant
+symb ex4 = 0                   /* coupling constant
+symb ex5 = -0.48                   /* coupling constant
+symb ex6 = 0                   /* coupling constant
+symb ey1 = 0                   /* coupling constant
+symb ey2 = 0                   /* coupling constant
+symb ey3 = 0                   /* coupling constant
+symb ey4 = $ex5                   /* coupling constant
+symb ey5 = 0                   /* coupling constant
+symb ey6 = 0                   /* coupling constant
+symb ez1 = -0.58                   /* coupling constant
+symb ez2 = $ez1                   /* coupling constant
+symb ez3 = 1.55                   /* coupling constant
+symb ez4 = 0                   /* coupling constant
+symb ez5 = 0                   /* coupling constant
+symb ez6 = 0                   /* coupling constant
+
+c    scale material properties as specified above
+
+symb aepxx = $epvacm * $epxx
+symb aepyy = $epvacm * $epyy
+symb aepzz = $epvacm * $epzz
+
+     wvsp off 
+     type lean
+
+     prop aln $rho
+     $c11     $c12     $c13     $c14    $c15    $c16    $c22
+     $c23     $c24     $c25     $c26    $c33    $c34    $c35
+     $c36     $c44     $c45     $c46    $c55    $c56    $c66
+
+     elec aln $aepxx $aepyy $aepzz
+
+     piez aln 1 1 $ex1 1 2 $ex2 1 3 $ex3 1 4 $ex4 1 5 $ex5 1 6 $ex6 &
+       2 1 $ey1 2 2 $ey2 2 3 $ey3 2 4 $ey4 2 5 $ey5 2 6 $ey6 &
+       3 1 $ez1 3 2 $ez2 3 3 $ez3 3 4 $ez4 3 5 $ez5 3 6 $ez6
+
+     rdmp aln $freqdamp q $qdmp $qsdmp $freqloss 1.0
+
+     axis aln posy   /* relate materials local system to global system
+	 
+	 hrgl aln bb 1.
+
+
+c -------------------------------------------------------------- 
+c type : SOLID : 
+c name : moly : 
+c desc : Molybdenum
+c -------------------------------------------------------------- 
+
+
+   wvsp on 
+   type elas 
+   prop moly 10220 6650. 3509.
+   vdmp moly $freqdamp db 0.1 0.3 1e+06 1 0.01 1
+   hrgl moly bb 1.
+   
+   
+c -------------------------------------------------------------- 
+c type : GAS : 
+c name : air : 
+c desc : Air, room temp : 
+c -------------------------------------------------------------- 
+
+
+   wvsp on 
+   type elas 
+   prop air 1.24 343 0 0.0
+ 
+   elec void $epvacm
+
+   
+   
+c -------------------------------------------------------------- 
+c type : SOLID : 
+c name : sio2 : 
+c desc : Silicon Dioxide, Quartz, generic
+c -------------------------------------------------------------- 
+
+
+   wvsp on 
+   type elas 
+   prop sio2 2150 5915.67 3730.11
+   vdmp sio2 $freqdamp db 0.1 0.3 1e+06 1 0.01 1
+   symb eps = 1
+   symb aeps = $epvacm * $eps
+   elec sio2 $aeps 
+
+
+   elec void $epvacm
+   end

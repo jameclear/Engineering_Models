@@ -1,0 +1,298 @@
+c remove MEM on windows versions
+
+c *************************************************************************************************************
+c
+c DESIGNER		:  PZFlex
+c MODEL DESCRIPTION	:	Langevin Transducer
+c DATE CREATED		:	19/12/2016
+c VERSION		:	1.0
+c
+c *************************************************************************************************************
+
+c Set model title
+titl    COMSOL    Piezo Transducer 
+
+c Use all cores
+mp omp * *
+
+c Do not save restart file
+rest no
+
+c ************************************************************************************************************
+c									MODEL INPUTS
+c ************************************************************************************************************
+
+c All inputs should be in this section
+
+c Geometry
+symb dev_inrad = 380e-6
+symb dev_outrad = 620e-6
+symb dev_height = 620e-6
+symb ascal = 4
+
+symb segments = 15
+symb segment_angle = 90 / $segments
+
+c material
+text piezo = pzt5h_py
+
+c Frequency and mesh
+symb freqint = 5e6
+symb freqdamp = $freqint
+symb vel = 1750
+symb wavelength = $vel / $freqint
+symb nepw = 20
+symb box = $wavelength / $nepw
+
+c Simulation time
+symb nloops = 30
+symb simtime = $nloops / $freqint
+
+c Calculations including Meshing
+symb rad_diff = $dev_outrad - $dev_inrad
+
+
+c ***********************************************************************************************************
+c									MESHING
+c ***********************************************************************************************************
+
+c Create X-Y-Z Keypoints
+symb #keycord x 1 0. $dev_inrad $rad_diff $box
+symb #get { idx } rootmax x
+
+symb #keycord y 1 0. $dev_height
+symb #get { jdx } rootmax y
+
+symb #keycord z 1 0. $dev_inrad $rad_diff $box
+symb #get { kdx } rootmax z
+
+c Create I-J-K Keypoints
+c *** Grid in I direction, using approximately element size of 'box' and at least 1 element ***
+symb #keyindx i 1 $idx 1 $box 1 
+symb indgrd = $i$idx
+
+c *** Grid in J direction, using approximately element size of 'boxy' and at least 1 element ***
+symb #keyindx j 1 $jdx 1 $box 1
+symb jndgrd = $j$jdx
+
+c *** Grid in K direction, using approximately element size of 'box' and at least 1 element ***
+symb #keyindx k 1 $kdx 1 $box 1
+symb kndgrd = $k$kdx
+
+c *** list the creation of all the key points in XYZ and IJK ***
+symb #list
+
+c Create Grid
+grid $indgrd $jndgrd $kndgrd
+
+c Map Geometry to Grid
+geom keypnt $idx $jdx $kdx
+
+
+c **********************************************************************************************************
+c 									MATERIAL PROPERTIES
+c **********************************************************************************************************
+
+
+
+c Material definitions
+symb #read Material.prjmat
+
+c Allocate materials to grid
+site
+	regn void2
+	
+	symb ab = 0
+	symb ae = $ab + $segment_angle 
+	
+	do loopi I 1 $segments 1
+		cyln pz$I stnd y $y1 $y2 $z1 $x1 $dev_outrad $dev_outrad $dev_inrad $dev_inrad $ab $ae 
+		symb ab = $ae
+		symb ae = $ab + $segment_angle 
+	end$ loopi
+	
+	cyln void stnd y $y1 $y2 $z1 $x1 $dev_inrad $dev_inrad 
+	
+	end
+
+grph
+	comb matr void void2
+	nvew 2 2
+	plot matr
+	mirr x on
+	mirr z on
+	plot matr
+	set imag tiff
+	imag Model.tiff
+	
+	end
+term
+
+c **********************************************************************************************************
+c 									BOUNDARY CONDITIONS & LOADING
+c **********************************************************************************************************
+
+c External boundary conditions
+boun
+	side xmin symm 
+	side xmax free 
+	side ymin free
+	side ymax free 
+ 	side zmin symm 
+	side zmax free 
+	end
+
+c Define time varying funciton
+func wvlt $freqint 1.
+
+c Circuit Definition
+circ
+	defn dmp1
+	elem rest sers 50
+	end
+
+c Piezoelectric loads
+piez	
+	wndo auto piez /*$i1 $indgrd $j2 $j3
+
+	/* Loop through all elements
+	defn top $ascal
+	do loopi I 1 $segments 1
+		nod2 pz$I void2
+	end$ loopi
+	
+	defn bot $ascal
+	
+	do loopi I 1 $segments 1
+		nod2 pz$I void
+	end$ loopi
+	
+	conn top dmp1 volt func
+	bc bot grnd
+	
+	slvr pard
+	end
+
+
+c ********************************************************************************************************
+c 									OUTPUTS
+c ********************************************************************************************************
+
+c Request calculation of additional arrays
+calc
+	pres aprs
+	disp
+	end
+
+c Request time domain outputs
+pout
+	hist func
+	histname electrode vq all
+	end
+
+symb n_shap = 4
+shap
+	data ydsp
+	freq 878e3
+	freq 2.35e6
+	freq 5.13e6
+	freq 7.5e6
+	end
+
+c *******************************************************************************************************
+c 									PROCESS MODEL
+c *******************************************************************************************************
+
+c Time settings
+time * * 0.9
+zone auto
+
+c Process model
+prcs     
+
+grph
+	nvew 2 2
+	arrow pole 3 5  
+	plot piez
+	plot matr piez
+	arrow off
+	end
+term
+
+c *******************************************************************************************************
+c						 			MODEL EXECUTION
+c *******************************************************************************************************
+
+c Runtime calculations
+symb #get { step } timestep
+symb nexec = $simtime / $step
+symb nrun = $nexec / $nloops
+
+c Set up plotting
+grph
+	set imag avi 10
+	nvew 2 2
+	arrow off
+	line off
+c	comb matr void watr
+	end
+
+c Run model
+proc plot save
+
+exec $nrun
+
+/* Plot pressure
+grph
+	plot ydsp
+	plot 3
+	imag
+	end
+
+end$ proc
+
+symb #get { tbeg } wtime
+
+/* Run model
+c proc plot $nloops
+exec ringdown electrode q top
+
+/* Calculate runtime and display to user
+symb #get { tend } wtime
+symb trun = $tend - $tbeg
+symb #msg 1 
+Total runtime: $trun seconds
+
+
+symb #msg 1 
+Continue running - Enter 'proc plot N' where N is the number of procedure calls
+term
+
+
+c *******************************************************************************************************
+c									ADDITIONAL OUTPUTS
+c *******************************************************************************************************
+
+c Data outputs
+if ( $n_shap gt 0 ) then
+c Convert data to normalised polar
+data
+
+do loopd I 1 $n_shap 1
+	/* Ith Frequency
+c	polr shap/zdsp:r$I shap/zdsp:i$I  to shap/zdsp:m$I shap/zdsp:p$I
+ 	polr shap/ydsp:r$I shap/ydsp:i$I  to shap/ydsp:m$I shap/ydsp:p$I
+c 	polr shap/xdsp:r$I shap/xdsp:i$I  to shap/xdsp:m$I shap/xdsp:p$I
+end$ loopd
+	end
+
+data
+	out shap/all	/* Output all shape data to flexdato file
+	end
+endif
+c Save symbols to file for later use
+symb #get { labl } jobname					/* find name of run
+symb #save symb.$labl						/* save in symb file
+
+c End of input file
+stop								

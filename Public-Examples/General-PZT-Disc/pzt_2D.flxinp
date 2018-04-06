@@ -1,0 +1,257 @@
+c *************************************************************************************************************
+c
+c								2D Model of PZT Disc
+c
+c *************************************************************************************************************
+c
+c DESIGNER		:  		PZFlex
+c MODEL DESCRIPTION	:	2D Model of PZT Disc
+c DATE CREATED		:	09/12/16
+c VERSION		:		1.0
+c
+c *************************************************************************************************************
+
+c The adds a title and description to output files
+titl  pzt_2D	2D Model of PZT Disc
+
+c Use all cores on machine
+mp omp * *
+
+c No restart
+rest no
+
+
+c ************************************************************************************************************
+c
+c									MODEL PARAMETERS
+c
+c ************************************************************************************************************
+
+c Define geometry
+symbx pzt_rad = 10.e-3					/* radius of pzt
+symb pzt_thk = 2.e-3 					/* thickness of PZT
+symb water_thk = 6.e-3					/* thickness of water
+
+c Define frequnecy and meshing
+symb freqint = 1.e6						/* frequency of interest
+symb vel = 1500.						/* minimum velocity
+symb nelem = 15							/* number of elements per wavelength
+symb wavelength = $vel / $freqint		/* calculate wavelength
+symb box = $wavelength / $nelem			/* calculate box size for model
+symb freqdamp = $freqint				/* damping frequency, used in damping models
+
+c Electrical
+symb rdamp = 50.						/* damping resistor value (Ohms)
+
+c Runtime
+symb ncycles = 60						/* run model for 20 cycles
+symb nloops = 10						/* plot model to screen this many times
+
+
+
+c ***********************************************************************************************************
+c
+c								X-Y-Z CO-ORDINATE SYSTEM
+c
+c ***********************************************************************************************************
+
+c Alternate way of defining keypoints
+symb #keycord x 1 0. $pzt_rad $water_thk				/* this defines x1, x2, x3
+symb #get { idx } rootmax x								/* find max indice for x variables
+
+c Define keypoints in y
+symb #keycord y 1 0. $water_thk	$pzt_thk $water_thk		/* this defines y1, y2, y3, y4
+symb #get { jdx } rootmax y								/* find max indice for y variables
+
+
+
+c ************************************************************************************************************
+c
+c									I-J-K CO-ORDINATE SYSTEM
+c
+c ************************************************************************************************************
+
+c Alternate way of creating i keypoints
+symb #keyindx i 1 $idx 1 $box
+symb indgrd = $i$idx						/* store maximum i value - ie. number of nodes in i
+
+c Define j keypoints
+symb #keyindx j 1 $jdx 1 $box
+symb jndgrd = $j$jdx						/* store maximum j value - ie. number of nodes in j
+
+c List symbols
+symb #list
+
+
+
+c ************************************************************************************************************
+c
+c									GRID & GEOMETRY DEFINITION
+c
+c ************************************************************************************************************
+
+c Create grid, with axisymmetric contraints
+grid $indgrd $jndgrd axiy
+
+c Assign geometry, shortened version
+geom keypnt $idx $jdx
+
+
+
+c **********************************************************************************************************
+c
+c 									MATERIAL PROPERTIES & SITE
+c
+c **********************************************************************************************************
+
+c Read material file
+symb #read pzt_disc.prjmat
+
+c Assign materials to grid
+site
+	regn watr
+	regn pmt3 $i1 $i2 $j2 $j3
+	end
+
+c Plot the model
+grph
+	line on				/* show node lines
+	mirr x on			/* mirror at minimum x
+	plot matr	
+	end
+
+term
+
+
+
+c **********************************************************************************************************
+c
+c 									INPUTS
+c
+c **********************************************************************************************************
+
+c Define external boundary conditions
+boun
+	side xmin symm
+	side xmax absr
+	side ymin absr
+	side ymax absr
+	end						/* end is not essential, but good practice
+
+c Define drive function, can be accessed using 'func' argument
+func wvlt $freqint 1.
+
+c Define damping circuit
+circ
+	defn cdamp						/* name of circuit
+	elem rest sers $rdamp			/* create series damping resistor
+	end
+
+c Define piezo solve
+piez
+	
+	/* Define electric window
+	wndo $i1 $i2 $j2 $j3
+	
+	/* Define top electrode
+	defn top 					/* new electrode called 'top'
+	node $i1 $i2 $j3 $j3		/* electrode location
+	conn top cdamp volt func	/* apply 'func' as a voltage
+	
+	/* Define bottom electrode
+	defn bot
+	node $i1 $i2 $j2 $j2
+	bc bot grnd					/* assign electrical ground
+
+	end
+
+extr
+	defn kirc
+	ref in $x1 $y2
+	node $i1 $i2+4 $j3+4 $j3+4
+	node $i1 $i2+4 $j2-4 $j2-4
+	node $i2+4 $i2+4 $j2-4 $j3+4
+	end
+
+
+c ********************************************************************************************************
+c 
+c 									OUTPUTS
+c
+c ********************************************************************************************************
+
+c Properties to calculate
+calc
+	disp					/* produces xdsp, and ydsp arrays
+	pres acoustic			/* calculate pressure, produces 'pres' array (structural engineering) and 'aprs' array (acousticians)
+	max aprs * pmax			/* store max acoustic pressure to 'pmax'
+	end
+
+c Time histories to store
+pout
+	hist func							/* #1 Drive function
+	histname electrode vq all			/* #2 - #5 Voltage and charge on each electrode
+	end
+
+
+
+c *******************************************************************************************************
+c
+c 									PROCESS MODEL
+c
+c *******************************************************************************************************
+
+c Process model, including setting time step
+prcs                                    
+
+c Plot model
+grph
+	arrow pole				/* plot poling arrows in pzt
+	plot matr piez			/* plot materials and electrodes
+	end
+
+term
+
+
+c *******************************************************************************************************
+c
+c						 			RUN THE MODEL
+c
+c *******************************************************************************************************
+
+c Set up run parameters
+symb simtime = $ncycles / $freqint		/* total runtime of the model
+symb #get { step } timestep				/* store timestep size in variable 'step'
+symb nexec = $simtime / $step			/* total number of executions
+symb nexec2 = $nexec / $nloops			/* number of executions in a loop
+
+c Set up graphics
+grph
+	line off							/* don't plot node lines
+	arrow off							/* don't plot poling arrows
+	nvew 2 2							/* 2 view windows side by side (type 2)
+	end
+
+c Define run/plot procedure
+proc plot save
+
+c Run model for some time
+exec $nexec2
+
+c Plot current state of model
+grph
+	plot yvel							/* plot acoustic pressure
+	plot 3								/* plot charge on top electrode
+	end
+
+end$ proc								/* end of proc
+
+c Run model
+proc plot $nloops
+
+term
+
+
+stop								/* return to command prompt
+
+
