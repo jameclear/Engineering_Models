@@ -3,14 +3,14 @@ c remove MEM on windows versions
 c *************************************************************************************************************
 c
 c DESIGNER		:  PZFlex
-c MODEL DESCRIPTION	:	Langevin Transducer
+c MODEL DESCRIPTION	:	Radial Tube
 c DATE CREATED		:	19/12/2016
 c VERSION		:	1.0
 c
 c *************************************************************************************************************
 
 c Set model title
-titl    COMSOL    Piezo Transducer 
+titl    Radial    Piezo Transducer 
 
 c Use all cores
 mp omp * *
