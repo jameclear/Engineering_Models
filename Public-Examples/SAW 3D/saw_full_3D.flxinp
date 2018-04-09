@@ -1,0 +1,384 @@
+c *************************************************************************************************************
+c
+c								3D Model of SAW Filter
+c
+c *************************************************************************************************************
+c
+c DESIGNER		:  		OnScale
+c MODEL DESCRIPTION	:	3D Model of SAW Filter
+c DATE CREATED		:	04/04/18
+c VERSION		:		1.0
+c
+c *************************************************************************************************************
+
+c The adds a title and description to output files
+titl  saw_full_3D		3D Model of SAW
+
+c Use all cores on machine
+mp omp * *
+
+c No restart file
+rest no
+
+
+
+c ************************************************************************************************************
+c
+c									MODEL PARAMETERS
+c
+c ************************************************************************************************************
+
+/* To vary a design parameter in a sweep replace 'symb' with 'symbx'
+/* Initial parameters set up to model 1/4 scale device - see comments below
+
+c Thicknesses
+symb subs_thk = 5.0e-6					/* substrate thickness
+symbx elec_thk = 200.e-9				/* electrode thickness
+
+c IDT
+symb fin_pitch = 1.30e-6				/* finger pitch
+symbx aratio = 0.50						/* metalization aspect ratio
+symb fin_width = $fin_pitch * $aratio	/* finger width
+symb fin_gap = $fin_pitch - $fin_width	/* finger gap
+symb nfing = 25					 		/* pairs of fingers - full device 100
+symb fin_len = 12.5e-6					/* finger length - full device 50.e-6
+symb edge_y = 2.e-6						/* edge of substrate in y
+symb eelec_len = 1.e-6					/* stub finger length
+symb egap_len = $fin_gap				/* electrode gap
+
+c Grating
+symb gap = 1.035e-6 					/* gap between IDT and grating
+symb ngrat = 10							/* number of grating fingers full device 40
+symb grat_pitch = 1.3e-6				/* grating pitch
+symb agratio = 0.50						/* grating metalization aspect ratio
+symb grat_width = $grat_pitch * $agratio	/* grating electrode width			
+symb grat_gap = $grat_pitch - $grat_width	/* grating electrode gap
+symb edge_x = 2.e-6						/* edge of substrate in x
+
+c Active material
+text piezo_mat = 'lt'					/* piezo material: 'lt' for LiTaO3, or 'lno' for LiNb03
+symb cut_ang = 42.						/* rotated y-cut angle
+
+c Define frequnecy and meshing
+symb freqint = 1.5e9					/* frequency of interest
+symb vel = 3800.						/* minimum velocity
+symb nelem = 5							/* number of elements per wavelength
+symb wavelength = $vel / $freqint		/* calculate wavelength
+symb box = $wavelength / $nelem			/* calculate box size for model
+symb boxy = 4. * $box
+symb freqdamp = $freqint				/* damping frequency, used in damping models
+
+c Runtime
+symb ncycles = 200						/* run model for N cycles - full model set to 1500
+symb nloops = 20						/* plot model to screen this many times
+symb tfact = 0.80						/* set time stability factor - default 0.8
+
+c Calculations
+symb ascal = 1.
+symb fin_width2 = $fin_width / 2.
+symb fin_gap2 = $fin_gap / 2.
+symb fin_len2 = $fin_len / 2.
+symb ncopy = $nfing - 2
+symb ncopy_grat = $ngrat - 2
+symb simtime = $ncycles / $freqint		/* total runtime of the model
+text piezo_struc = '$(piezo_mat)struc'
+
+
+
+c ***********************************************************************************************************
+c
+c								X-Y-Z CO-ORDINATE SYSTEM
+c
+c ***********************************************************************************************************
+
+c Define keypoints in x
+symb #keycord x 1 0. $edge_x $grat_width $grat_gap $grat_width
+symb #keycopy x 3 5 $ncopy_grat
+symb #get { ig1end } rootmax x
+
+symb #keycord x $ig1end $x$ig1end $gap $fin_width $fin_gap $fin_width $fin_gap $fin_width $fin_gap $fin_width
+symb if1beg = $ig1end + 1
+symb if1end = $ig1end + 2
+symb if2beg = $ig1end + 3
+symb if2end = $ig1end + 4
+symb if3beg = $ig1end + 5
+symb if3end = $ig1end + 6
+symb if4beg = $ig1end + 7
+symb if4end = $ig1end + 8
+symb #keycopy x $if2end $if4end $ncopy
+symb #get { idtend } rootmax x	
+
+symb #keycord x $idtend $x$idtend $gap $grat_width $grat_gap $grat_width
+symb ig2beg = $idtend + 1
+symb ig2end = $idtend + 2
+symb ig3beg = $idtend + 3
+symb ig3end = $idtend + 4
+symb #keycopy x $ig2end $ig3end $ncopy_grat 
+symb #get { ig4end } rootmax x
+symb #keycord x $ig4end $x$ig4end $edge_x
+symb #get { idx } rootmax x	
+
+c Define keypoints in y
+symb #keycord y 1 0. $edge_y $fin_width $eelec_len $egap_len $fin_len2 $fin_len2 $egap_len $eelec_len $fin_width $edge_y						
+symb #get { jdx } rootmax y		
+
+c Define keypoints in y
+symb #keycord z 1 0. $subs_thk $elec_thk			
+symb #get { kdx } rootmax z								
+
+
+
+c ************************************************************************************************************
+c
+c									I-J-K CO-ORDINATE SYSTEM
+c
+c ************************************************************************************************************
+
+c Define i keypoints
+symb #keyindx i 1 $idx 1 $box
+symb indgrd = $i$idx						/* store maximum i value - ie. number of nodes in i
+
+c Define j keypoints
+symb #keyindx j 1 $jdx 1 $boxy
+symb jndgrd = $j$jdx						/* store maximum j value - ie. number of nodes in j
+
+c Define k keypoints
+symb #keyindx k 1 $kdx 1 $box
+symb kndgrd = $k$kdx						/* store maximum j value - ie. number of nodes in j
+
+
+c List symbols
+symb #list
+
+c Output DOF to user
+symb nmech_nodes = $indgrd * $jndgrd * $kndgrd
+symb nmech_dof = $nmech_nodes * 3
+symb nelec_nodes = $indgrd * $jndgrd * ( $k2 - $k1 + 1 )
+symb nelec_dof = $nelec_nodes * 1
+symb ndof = $nmech_dof + $nelec_dof
+symb #msg 8
+
+********************************************
+Number of Nodes: $nmech_nodes
+Mechanical DOF:   $nmech_dof
+Electrical DOF:      $nelec_dof
+Total DOF:           $ndof
+********************************************
+
+
+
+c ************************************************************************************************************
+c
+c									GRID & GEOMETRY DEFINITION
+c
+c ************************************************************************************************************
+
+c Create grid, with axisymmetric contraints
+grid $indgrd $jndgrd $kndgrd
+
+c Assign geometry, shortened version
+geom keypnt $idx $jdx $kdx
+
+
+
+c **********************************************************************************************************
+c
+c 									MATERIAL PROPERTIES & SITE
+c
+c **********************************************************************************************************
+
+c Read material file
+symb #read saw.prjmat
+
+c Assign materials to grid
+site
+	regn void
+	
+	/* Substrate
+	regn $piezo_struc * * * * $k1 $k2
+	regn $piezo_mat $i1+1 $indgrd-1 $j1+1 $jndgrd-1 $k1+1 $k2 	
+	
+  	/* Grating Electrode
+  	regn alum3 $i2 $i3 $j2 $j10 $k2 $k3 
+ 	regn alum3 $i4 $i5 $j2 $j10 $k2 $k3 
+ 	regn alum3 $i2 $i5 $j2 $j3 $k2 $k3 
+ 	regn alum3 $i2 $i5 $j9 $j10 $k2 $k3 
+  	regndupl $i3 $i5 * * $k2 $k3 i $ncopy_grat
+ 	
+   	/* IDT Electrodes
+   	regn alum1 $i$if1beg $i$if1end $j2 $j7 $k2 $k3
+ 	regn alum2 $i$if1beg $i$if1end $j8 $j10 $k2 $k3
+   	regn alum2 $i$if2beg $i$if2end $j5 $j10 $k2 $k3
+ 	regn alum1 $i$if2beg $i$if2end $j2 $j4  $k2 $k3
+   	regn alum1 $i$if3beg $i$if3end $j2 $j7 $k2 $k3
+ 	regn alum2 $i$if3beg $i$if3end $j8 $j10 $k2 $k3
+   	regn alum2 $i$if4beg $i$if4end $j5 $j10 $k2 $k3
+ 	regn alum1 $i$if4beg $i$if4end $j2 $j4  $k2 $k3
+ 	
+   	regn alum1 $i$if1beg $i$if4end $j2 $j3 $k2 $k3
+   	regn alum2 $i$if1end $i$if4end $j9 $j10 $k2 $k3
+   	regndupl $i$if2end $i$if4end * * $k2 $k3 i $ncopy
+  	
+   	/* Grating Electrode
+   	regn alum3 $i$ig2beg $i$ig2end $j2 $j10 $k2 $k3
+  	regn alum3 $i$ig3beg $i$ig3end $j2 $j10 $k2 $k3
+ 	regn alum3 $i$ig2beg $i$ig3end $j2 $j3 $k2 $k3
+  	regn alum3 $i$ig2beg $i$ig3end $j9 $j10 $k2 $k3
+   	regndupl $i$ig2end $i$ig3end * * $k2 $k3 i $ncopy_grat
+ 	
+	end
+
+c Plot the model
+grph
+	vert 0 0 1					/* set vertical axis
+	comb root matr $piezo_mat	/* plot all piezo materials in same color
+	plot matr					/* plot geometry
+	end
+
+term
+
+
+
+c **********************************************************************************************************
+c
+c 									INPUTS
+c
+c **********************************************************************************************************
+
+c Define external boundary conditions
+boun
+	side xmin absr
+	side xmax absr
+	side ymin absr
+	side ymax absr
+	side zmin absr
+	side zmax free
+	end
+
+c Define drive function, can be accessed using 'func' argument
+func wvlt $freqint 1.
+
+c Define piezo solve
+piez
+	/* Define electric window
+	wndo * * * * $k1 $k2 
+	
+	/* IDT driven
+	defn idt1 $ascal
+	nod2 alum1 $piezo_mat * * * * $k2-1 $k2+1 
+	bc idt1 volt func
+
+	/* IDT grounded
+	defn idt2 $ascal
+	nod2 alum2 $piezo_mat * * * * $k2-1 $k2+1 
+	bc idt2 grnd
+	
+	/* Grating
+	defn grat $ascal
+	nod2 alum3 $piezo_mat * * * * $k2-1 $k2+1 
+	bc grat grnd
+	
+	/* Set solver
+	slvr pard
+	end
+
+
+
+c ********************************************************************************************************
+c 
+c 									OUTPUTS
+c
+c ********************************************************************************************************
+
+c Time histories to store
+pout
+	hist func							/* #1 Drive function
+	histname electrode vq idt1			/* #2 - #3 Voltage and charge on top electrode
+	end
+
+c Mode shapes
+shap
+	twnd $simtime hann righ 1.
+	freq $freqint
+	data ydsp
+	end
+
+
+
+c *******************************************************************************************************
+c
+c 									PROCESS MODEL
+c
+c *******************************************************************************************************
+
+c Time stability factor
+time * * $tfact
+
+c Process model, including setting time step
+prcs                                    
+
+c Plot model
+grph
+	plot matr piez			/* plot materials and electrodes
+	end
+
+term
+
+
+
+c *******************************************************************************************************
+c
+c						 			RUN THE MODEL
+c
+c *******************************************************************************************************
+
+c Set up run parameters
+symb simtime = $ncycles / $freqint		/* total runtime of the model
+symb #get { step } timestep				/* store timestep size in variable 'step'
+symb nexec = $simtime / $step			/* total number of executions
+symb nexec2 = $nexec / $nloops			/* number of executions in a loop
+
+c Set up graphics
+grph
+	nvew 2 2							/* two plotting windows
+	end
+
+c Define run/plot procedure
+proc plot save
+
+c Run model for some time
+exec $nexec2
+
+c Plot current state of model
+grph
+	plot yvel							/* plot acoustic velocity in y
+	plot 3								/* plot charge on top electrode
+	end
+
+end$ proc								/* end of proc
+
+c Get start time
+symb #get { tbeg } wtime
+
+c Run model
+proc plot $nloops
+
+c Plot runtime
+symb #get { tend } wtime
+symb trun = $tend - $tbeg
+
+c Report runtime
+symb #msg 2
+Runtime: $trun
+
+term
+
+c Output shape data
+data
+	out modl
+	out shap/all
+	end
+
+stop								/* return to command prompt
+
+

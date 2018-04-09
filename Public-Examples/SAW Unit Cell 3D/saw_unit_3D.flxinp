@@ -1,0 +1,367 @@
+c *************************************************************************************************************
+c
+c								3D Unit Cell Model of SAW Filter
+c
+c *************************************************************************************************************
+c
+c DESIGNER		:  		OnScale
+c MODEL DESCRIPTION	:	3D Unit Cell Model of SAW Filter
+c DATE CREATED		:	04/04/18
+c VERSION		:		1.0
+c
+c *************************************************************************************************************
+
+c The adds a title and description to output files
+titl  saw_unit_3D	3D Unit Cell Model of SAW Filter
+
+c Use all cores on machine
+mp omp * * 
+
+c No restart file
+rest no
+
+
+
+c ************************************************************************************************************
+c
+c									MODEL PARAMETERS
+c
+c ************************************************************************************************************
+
+/* To vary a design parameter in a sweep replace 'symb' with 'symbx'
+
+c Thicknesses
+symb subs_thk = 7.5e-6					/* substrate thickness
+symbx elec_thk = 200.e-9				/* electrode thickness
+
+c IDT
+symb fin_pitch = 1.30e-6				/* finger pitch
+symbx aratio = 0.50						/* metalization aspect ratio
+symb fin_width = $fin_pitch * $aratio	/* finger width
+symb fin_gap = $fin_pitch - $fin_width	/* finger gap
+symb nfing = 100						/* pairs
+symb fin_len = 50.e-6					/* finger length
+
+c Active material
+text piezo_mat = 'lt'					/* piezo material: 'lt' for LiTaO3, or 'lno' for LiNb03
+symb cut_ang = 42.						/* rotated y-cut angle
+
+c Define frequnecy and meshing
+symb freqint = 1.5e9					/* frequency of interest
+symb vel = 3800.						/* minimum velocity
+symb nelem = 15							/* number of elements per wavelength
+symb wavelength = $vel / $freqint		/* calculate wavelength
+symb box = $wavelength / $nelem			/* calculate box size for model
+symb freqdamp = $freqint				/* damping frequency, used in damping models
+
+c Runtime
+symb ncycles = 2500						/* run model for N cycles
+symb nloops = 10						/* plot model to screen this many times
+symb tfact = 0.80						/* set time stability factor - default 0.8
+
+c EBond 
+symb nbondopt = 1						/* activate periodic electric boundaries
+
+c Calculations
+symb ascal = $nfing * $fin_len / $box
+symb fin_width2 = $fin_width / 2.
+symb fin_gap2 = $fin_gap / 2.
+symb fin_len2 = $fin_len / 2.
+symb fin_pitch = ( $fin_width + $fin_gap ) * 2.
+symb simtime = $ncycles / $freqint		/* total runtime of the model
+text piezo_struc = '$(piezo_mat)struc'
+
+
+
+c ***********************************************************************************************************
+c
+c								X-Y-Z CO-ORDINATE SYSTEM
+c
+c ***********************************************************************************************************
+
+c Define keypoints in x
+symb #keycord x 1 0. $fin_gap2 $fin_width $fin_gap $fin_width $fin_gap2								
+symb #get { idx } rootmax x								
+c Define keypoints in y
+symb #keycord y 1 0. $box
+symb #get { jdx } rootmax y	
+
+c Define keypoints in z
+symb #keycord z 1 0. $subs_thk $elec_thk			
+symb #get { kdx } rootmax z	
+
+
+
+c ************************************************************************************************************
+c
+c									I-J-K CO-ORDINATE SYSTEM
+c
+c ************************************************************************************************************
+
+c Define i keypoints
+symb #keyindx i 1 $idx 1 $box
+symb indgrd = $i$idx						/* store maximum i value - ie. number of nodes in i
+
+c Define j keypoints
+symb #keyindx j 1 $jdx 1 $box
+symb jndgrd = $j$jdx						/* store maximum j value - ie. number of nodes in j
+
+c Define k keypoints
+symb #keyindx k 1 $kdx 1 $box
+symb kndgrd = $k$kdx						/* store maximum j value - ie. number of nodes in j
+
+c List symbols
+symb #list
+
+c Output DOF to user
+symb nmech_nodes = $indgrd * $jndgrd * $kndgrd
+symb nmech_dof = $nmech_nodes * 3
+symb nelec_nodes = $indgrd * $jndgrd * ( $k2 - $k1 + 1 )
+symb nelec_dof = $nelec_nodes * 1
+symb ndof = $nmech_dof + $nelec_dof
+symb #msg 8
+
+********************************************
+Number of Nodes: $nmech_nodes
+Mechanical DOF:   $nmech_dof
+Electrical DOF:      $nelec_dof
+Total DOF:           $ndof
+********************************************
+
+
+
+c ************************************************************************************************************
+c
+c									GRID & GEOMETRY DEFINITION
+c
+c ************************************************************************************************************
+
+c Create grid, with axisymmetric contraints
+grid $indgrd $jndgrd $kndgrd
+
+c Assign geometry, shortened version
+geom keypnt $idx $jdx $kdx
+
+
+
+c **********************************************************************************************************
+c
+c 									MATERIAL PROPERTIES & SITE
+c
+c **********************************************************************************************************
+
+c Read material file
+symb #read saw.prjmat
+
+c Assign materials to grid
+site
+	/* Void all of grid
+	regn void
+	
+	/* Layers
+	regn $piezo_mat * * * * $k1 $k2 
+	regn $piezo_struc * * * * $k1 $k1+1 
+
+	/* Electrodes
+ 	regn alum1 $i2 $i3 * * $k2 $k3 
+ 	regn alum2 $i4 $i5 * * $k2 $k3 
+	end
+
+c Plot the model
+grph
+	vert 0 0 1					/* set vertical axis
+	comb root matr $piezo_mat	/* plot all piezo materials in same color
+	plot matr					/* plot geometry
+	end
+
+term
+
+
+
+c **********************************************************************************************************
+c
+c 									INPUTS
+c
+c **********************************************************************************************************
+
+c Define external boundary conditions
+boun
+	side zmin absr
+	side zmax free
+	end			
+
+c Periodic boundaries
+bond
+ 	defn bperx nchk
+ 	cors $i1 $i1 * * * *
+ 	fine $indgrd $indgrd * * * *
+	
+	defn bpery nchk
+ 	cors * * $j1 $j1 * *
+ 	fine * * $j2 $j2 * *
+	end
+
+c Define drive function, can be accessed using 'func' argument
+func wvlt $freqint 1.
+
+c Define piezo solve
+piez
+	/* Define electric window
+	wndo * * * * $k1 $k2 
+	
+	/* IDT Inner
+	defn idt1 $ascal
+	node $i2 $i3 * * $k2 $k2
+	bc idt1 volt func
+
+	/* IDT Outer
+	defn idt2 $ascal
+	node $i4 $i5 * * $k2 $k2
+	bc idt2 grnd
+
+	/* Set up electric bond in y
+	symb kbmin = $k2 - 5
+	if ( $nbondopt eq 1 ) then
+		do loopI I $i1+1 $indgrd-1 1
+			
+			/* Do sub surface layers
+			do loopK K $kbmin $k2-1 1
+				
+				/* Define electrode on each side
+				defn ybnd.$I.$K
+				node $I $I $j1 $j1 $K $K
+				node $I $I $jndgrd $jndgrd $K $K
+
+			end$ loopK
+
+			/* Do top layer
+			symb #get { i2val } clsnode $x2
+			symb #get { i5val } clsnode $x5
+			symb #get { i3val } clsnode $x3
+			symb #get { i4val } clsnode $x4
+			if ( $I lt $i2val ) or ( $I gt $i5val ) then
+				defn ybnd.$I.$k2
+				node $I $I $j1 $j1 $k2 $k2
+				node $I $I $jndgrd $jndgrd $k2 $k2
+			elseif ( $I gt $i3val ) and ( $I lt $i4val ) then
+				defn ybnd.$I.$k2
+				node $I $I $j1 $j1 $k2 $k2
+				node $I $I $jndgrd $jndgrd $k2 $k2
+			endif
+			
+		end$ loopI
+		
+		/* Set up electric bond in x&y
+		do loopK K $kbmin $k2 1
+			defn xybnd.$K
+			node $i1 $i1 $j1 $j1 $K $K
+			node $i1 $i1 $j2 $j2 $K $K
+			node $indgrd $indgrd $j1 $j1 $K $K
+			node $indgrd $indgrd $j2 $j2 $K $K
+		end$ loopK
+	endif
+		
+	/* Set solver
+	slvr pard
+		
+	end
+
+
+
+c ********************************************************************************************************
+c 
+c 									OUTPUTS
+c
+c ********************************************************************************************************
+
+c Time histories to store
+pout
+	hist func							/* #1 Drive function
+	histname electrode vq idt1			/* #2 - #5 Voltage and charge on each electrode
+	end
+
+c Mode shapes
+shap
+	twnd $simtime hann righ 1.
+	freq $freqint
+	data ydsp
+	end
+
+
+
+c *******************************************************************************************************
+c
+c 									PROCESS MODEL
+c
+c *******************************************************************************************************
+
+c Time stability factor
+time * * $tfact
+
+c Process model, including setting time step
+prcs                                    
+
+c Plot model
+grph
+	plot matr 			
+	end
+
+term
+
+
+c *******************************************************************************************************
+c
+c						 			RUN THE MODEL
+c
+c *******************************************************************************************************
+
+c Set up run parameters
+symb #get { step } timestep				/* store timestep size in variable 'step'
+symb nexec = $simtime / $step			/* total number of executions
+symb nexec2 = $nexec / $nloops			/* number of executions in a loop
+
+c Set up graphics
+grph
+	nvew 2 2							/* two plotting windows
+	end
+
+c Define run/plot procedure
+proc plot save
+
+c Run model for some time
+exec $nexec2
+
+c Plot current state of model
+grph
+	plot yvel							/* plot acoustic velocity in y
+	plot 3								/* plot charge on top electrode
+	end
+
+end$ proc								/* end of proc
+
+c Get start time
+symb #get { tbeg } wtime
+
+c Run model
+proc plot $nloops
+
+c Plot runtime
+symb #get { tend } wtime
+symb trun = $tend - $tbeg
+
+c Report runtime
+symb #msg 2
+Runtime: $trun
+
+
+term
+
+c Output shape data
+data
+	out modl
+	out shap/all
+	end
+
+stop								/* return to command prompt
+
+

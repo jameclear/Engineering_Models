@@ -1,0 +1,450 @@
+c *************************************************************************************************************
+c
+c								2D SMR Model
+c
+c *************************************************************************************************************
+c
+c DESIGNER		:  		OnScale
+c MODEL DESCRIPTION	:	2D SMR Model
+c VERSION		:		1.0
+c
+c *************************************************************************************************************
+
+c The adds a title and description to output files
+titl smr_2D		2D SMR Model
+
+c Use all cores on machine
+mp omp * *
+
+c No restart file
+rest no
+
+c ************************************************************************************************************
+c
+c									MODEL PARAMETERS
+c
+c ************************************************************************************************************
+
+/* Dimensions
+symb dev_wid = 100.e-6
+symb sub_out = 50.e-6
+symbx aln_thk = 2.75e-6
+symb subs_thk = 2.e-6
+symb vel_ox = 5915.67
+symb vel_tg = 5200.
+symbx nlayers = 5
+
+/* Frequency and mesh
+symb freqint = 2.e9
+symb freqdamp = $freqint
+symb vel = 6000.
+symb nepw = 15							/* number of elements per wavelength
+symb tfact = 0.95
+
+/* Runtime
+symb nloops = 20						/* number of times to plot
+symb ncycles = 5000					/* number of cycles
+
+/* Calculations
+symb wavelength = $vel / $freqint
+symb box = $wavelength / $nepw
+symb simtime = $ncycles / $freqint
+symb ascal = 2. * $dev_wid 
+symb pi = 4 * atan ( 1 )
+symb xlen2 = $dev_wid / 2.
+symb wave_ox = $vel_ox / $freqint
+symb ox_thk = $wave_ox / 4.
+symb wave_tg = $vel_tg / $freqint
+symb tg_thk = $wave_tg / 4.
+symb ncopy = $nlayers - 1
+
+c ***********************************************************************************************************
+c
+c								X-Y-Z CO-ORDINATE SYSTEM
+c
+c ***********************************************************************************************************
+
+c Define keypoints in x
+symb #keycord x 1 0. $xlen2	$sub_out		/* this defines x1, x2, x3
+symb #get { idx } rootmax x								/* find max indice for x variables
+
+c Define keypoints in y
+symb #keycord y 1 0. $subs_thk $tg_thk $ox_thk 
+symb #keycopy y 2 4 $ncopy
+symb #get { jbot } rootmax y	
+symb #keycord y $jbot $y$jbot $aln_thk 					
+symb #get { jdx } rootmax y								/* find max indice for y variables
+symb jtop = $jbot + 1
+
+c ************************************************************************************************************
+c
+c									I-J-K CO-ORDINATE SYSTEM
+c
+c ************************************************************************************************************
+
+c Define i keypoints
+symb #keyindx i 1 $idx 1 $box
+symb indgrd = $i$idx						/* store maximum i value - ie. number of nodes in i
+
+c Define j keypoints
+symb #keyindx j 1 $jdx 1 $box
+symb jndgrd = $j$jdx						/* store maximum j value - ie. number of nodes in j
+
+c List symbols
+symb #list
+
+c ************************************************************************************************************
+c
+c									GRID & GEOMETRY DEFINITION
+c
+c ************************************************************************************************************
+
+c Create grid, with axisymmetric contraints
+grid $indgrd $jndgrd
+
+c Assign geometry, shortened version
+geom keypnt $idx $jdx
+
+c **********************************************************************************************************
+c
+c 									MATERIAL PROPERTIES & SITE
+c
+c **********************************************************************************************************
+
+symb epvacm = 8.854e-12               /* dielectric constant for vacumn
+symb freqdamp = 1.e6 if noexist       /* specified frequency for damping model
+symb rmu0 = 1.2566e-6
+
+symb #msg 5
+********************************************************
+Damping matched at $freqdamp Hz
+Redefine variable 'freqdamp' if device centre frequency
+varies significantly from this value
+********************************************************
+
+c -------------------------------------------------------------------------
+c    Now define the axis transformation - only posx used in this file
+c -------------------------------------------------------------------------
+
+axis
+     form vctr
+     defn posx car2 0. 0. 0.    1.  0.  0.   0. 1. 0.
+     defn negx car2 0. 0. 0.   -1.  0.  0.   0. 1. 0.
+     defn posy car2 0. 0. 0.    0.  1.  0.   0. 0. 1.
+     defn negy car2 0. 0. 0.    0. -1.  0.   0. 0. 1.
+     defn posz car2 0. 0. 0.    0.  0.  1.   1. 0. 0.
+     defn negz car2 0. 0. 0.    0.  0. -1.   1. 0. 0.
+     end
+
+c -------------------------------------------------------------------------
+c    Input material properties to program
+c -------------------------------------------------------------------------
+
+matr
+c -------------------------------------------------------------- 
+c type : PIEZO : 
+c name : aln : 
+c desc : Aluminium Nitride : Thin film properties [1] from Sonitov "Elastic and Piezoelectric Properties of AlN and LiAlO2 Single Crystals" UFFC 2010
+c -------------------------------------------------------------- 
+
+c    define baseline dielectric coefficients
+symb epxx = 8.                   
+symb epyy = $epxx                  
+symb epzz = 9.5                   
+symb rho  = 3260                 
+symb qdmp = 10000.						/* from 1/tandelta
+symb qsdmp = $qdmp                      /* Mechanical Q at 1e6
+
+c    define baseline stiffness coefficients
+symb c11 = 34.5e10
+symb c12 = 12.5e10
+symb c13 = 12.0e10
+symb c14 = 0
+symb c15 = 0                 
+symb c16 = 0                 
+symb c22 = $c11
+symb c23 = $c13
+symb c24 = 0                  
+symb c25 = 0                  
+symb c26 = 0                 
+symb c33 = 39.5e10
+symb c34 = 0                  
+symb c35 = 0                  
+symb c36 = 0                 
+symb c44 = 11.8e10
+symb c45 = 0                  
+symb c46 = 0                  
+symb c55 = $c44
+symb c56 = 0                 
+symb c66 = ( $c11 - $c12 ) / 2.		/* rule for 6mm crystal symmetry
+
+c    define baseline piezoelectric coupling coefficients
+symb ex1 = 0                  
+symb ex2 = 0                  
+symb ex3 = 0                 
+symb ex4 = 0                  
+symb ex5 = -0.48               
+symb ex6 = 0                  
+symb ey1 = 0               
+symb ey2 = 0                  
+symb ey3 = 0                
+symb ey4 = $ex5                 
+symb ey5 = 0                  
+symb ey6 = 0                  
+symb ez1 = -0.58                  
+symb ez2 = $ez1                  
+symb ez3 = 1.55                   
+symb ez4 = 0                   
+symb ez5 = 0                  
+symb ez6 = 0                
+
+c    scale material properties as specified above
+symb aepxx = $epvacm * $epxx
+symb aepyy = $epvacm * $epyy
+symb aepzz = $epvacm * $epzz
+
+     wvsp off 
+     type lean
+
+     prop aln $rho
+     $c11     $c12     $c13     $c14    $c15    $c16    $c22
+     $c23     $c24     $c25     $c26    $c33    $c34    $c35
+     $c36     $c44     $c45     $c46    $c55    $c56    $c66
+
+     elec aln $aepxx $aepyy $aepzz
+
+     piez aln 1 1 $ex1 1 2 $ex2 1 3 $ex3 1 4 $ex4 1 5 $ex5 1 6 $ex6 &
+       2 1 $ey1 2 2 $ey2 2 3 $ey3 2 4 $ey4 2 5 $ey5 2 6 $ey6 &
+       3 1 $ez1 3 2 $ez2 3 3 $ez3 3 4 $ez4 3 5 $ez5 3 6 $ez6
+
+     rdmp aln $freqdamp q $qdmp $qsdmp 2.e9 1.0
+
+     axis aln posy   /* relate materials local system to global system
+	  
+c -------------------------------------------------------------- 
+c type : SOLID : 
+c name : alnstruc : 
+c desc : Aluminium Nitride Structural (no piezo)
+c -------------------------------------------------------------- 
+
+	 wvsp off 
+     type lean
+
+     prop alnstruc $rho
+     $c11     $c12     $c13     $c14    $c15    $c16    $c22
+     $c23     $c24     $c25     $c26    $c33    $c34    $c35
+     $c36     $c44     $c45     $c46    $c55    $c56    $c66
+
+     elec alnstruc $aepxx $aepyy $aepzz
+     rdmp alnstruc $freqdamp q $qdmp $qsdmp 2.e9 1.0
+     axis alnstruc posy   /* relate materials local system to global system 
+	 
+c -------------------------------------------------------------- 
+c type : METAL : 
+c name : alum : 
+c desc : Aluminium (damping v. low) : 
+c -------------------------------------------------------------- 
+
+	wvsp on 
+	type elas 
+	prop alum 2695 6306 3114 0.01
+	vdmp alum $freqdamp db 0.07 0.15 1.e9 1.0 1.e-6
+	symb eps = 1
+	symb aeps = $epvacm * $eps
+	elec alum $aeps 
+
+c -------------------------------------------------------------- 
+c type : SOLID : 
+c name : si : 
+c desc : Silicon, generic 
+c -------------------------------------------------------------- 
+
+   wvsp on 
+   type elas 
+   prop si 2330. 8784.14 4855.62
+   vdmp si $freqdamp db 0.1 0.3 1e+06 1 0.01 1
+
+c -------------------------------------------------------------- 
+c type : SOLID : 
+c name : sio2 : 
+c desc : Silicon Dioxide, Quartz, generic
+c -------------------------------------------------------------- 
+
+   wvsp on 
+   type elas 
+   prop sio2 2150 5915.67 3730.11
+   vdmp sio2 $freqdamp db 0.1 0.3 1e+06 1 0.01 1
+   symb eps = 1
+   symb aeps = $epvacm * $eps
+   elec sio2 $aeps  
+   
+c -------------------------------------------------------------- 
+c type : METAL : 
+c name : tung : 
+c desc : Tungsten , generic : 
+c -------------------------------------------------------------- 
+
+   wvsp on 
+   type elas 
+   prop tung 19400 5200 2900
+   vdmp tung $freqdamp db 0.27 0.8 1e+06 1 0.01 1
+   thrm tung 134 163.3 163.3 163.3 1.0 0 0 27
+   symb eps = 1
+   symb aeps = $epvacm * $eps
+   elec tung $aeps 
+
+	elec void $epvacm
+	end
+
+
+c Assign materials to grid
+site 
+	regn void
+	/* Layers
+	regn si * * $j1 $j2 
+	regn tung * * $j2 $j3
+	regn sio2 * * $j3 $j4
+	regndupl * * $j2 $j4 j $ncopy
+	regn aln * * $j$jbot $j$jtop 
+	regn alnstruc $i3-1 $i3 $j$jbot $j$jtop 
+	end
+	
+c Plot the model
+grph
+	mirr x on
+	plot matr	
+	end
+term
+
+c **********************************************************************************************************
+c
+c 									INPUTS
+c
+c **********************************************************************************************************
+
+c Define external boundary conditions
+boun
+	side xmin symm
+	side xmax impd	3385. 11099.62 6012.874 
+	side ymin impd	3385. 11099.62 6012.874
+	side ymax free
+	end						
+
+c Define drive function, can be accessed using 'func' argument
+func wvlt $freqint 1.
+
+c Define pressure load
+piez
+	wndo $i1 $i2 $j$jbot $j$jtop
+	
+	defn top $ascal
+	node $i1 $i2 $j$jtop $j$jtop
+	
+	defn bot $ascal
+	node $i1 $i2 $j$jbot $j$jbot
+	
+	bc top volt func
+	bc bot grnd
+	
+	/* slvr pard
+	end
+
+c ********************************************************************************************************
+c 
+c 									OUTPUTS
+c
+c ********************************************************************************************************
+
+c Calculations
+calc velm
+	max velm none vmax
+
+c Time histories
+pout
+	hist func
+	histname electrode vq all
+	end
+
+shap
+	data velm
+	freq $freqint
+	end
+
+c *******************************************************************************************************
+c
+c 									PROCESS MODEL
+c
+c *******************************************************************************************************
+
+c Process model, including setting time step
+time * * $tfact
+prcs                                    
+
+c Plot model
+grph
+	arrow pole				/* plot poling arrows in pzt
+	plot matr piez			/* plot materials and electrodes
+	end
+term
+
+c *******************************************************************************************************
+c
+c						 			RUN THE MODEL
+c
+c *******************************************************************************************************
+
+c Set up run parameters
+symb simtime = $ncycles / $freqint		/* total runtime of the model
+symb #get { step } timestep				/* store timestep size in variable 'step'
+symb nexec = $simtime / $step			/* total number of executions
+symb nexec2 = $nexec / $nloops			/* number of executions in a loop
+
+c Set up graphics
+grph
+	line off
+	arrow off							/* don't plot poling arrows
+	nvew 3 2
+	end
+
+c Define run/plot procedure
+proc plot save
+
+c Run model for some time
+exec $nexec2
+
+c Get log of yvel
+symb #get { vmax } datamax velm
+data math vlog = 20. * alog10 ( { velm } / $vmax + 1.e-21 )
+
+c Plot current state of model
+grph
+	plot yvel
+	plot vlog i 1
+	plot 3								/* plot charge on top electrode
+	end
+
+end$ proc								/* end of proc
+
+c Get start time
+symb #get { tbeg } wtime
+
+c Run model
+proc plot $nloops
+
+c Plot runtime
+symb #get { tend } wtime
+symb trun = $tend - $tbeg
+symb #msg 2
+Test runtime: $trun seconds
+
+term
+
+data
+	out modl
+	out vmax
+	
+	file out Shape.flxdato
+	out shap/all
+	end
+
+stop								/* return to command prompt
